@@ -299,6 +299,16 @@ export async function startPostProcessWorkflow(
   context: DbContext,
   data: StartPostProcessInput,
 ) {
+  // Check if we need to auto-set the published date
+  if (data.status === "published") {
+    const post = await PostRepo.findPostById(context.db, data.id);
+    if (post && !post.publishedAt) {
+      await PostRepo.updatePost(context.db, post.id, {
+        publishedAt: new Date(),
+      });
+    }
+  }
+
   await context.env.POST_PROCESS_WORKFLOW.create({
     params: {
       postId: data.id,
