@@ -131,6 +131,7 @@ mark {
   --color-info-foreground: hsl(var(--info-foreground));
 
   --color-selection: hsl(var(--selection));
+  --color-selection-foreground: hsl(var(--selection-foreground));
 }
 
 @layer base {
