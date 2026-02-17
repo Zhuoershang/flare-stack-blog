@@ -251,6 +251,28 @@ queryClient.invalidateQueries({ queryKey: POSTS_KEYS.lists });
 queryClient.invalidateQueries({ queryKey: POSTS_KEYS.list({ tag: "React" }) });
 ```
 
+### 6. 日志规范
+
+使用结构化 JSON 日志，便于在 Workers Observability 中搜索过滤：
+
+```typescript
+// ✅ Good
+console.log(JSON.stringify({ message: "cache hit", key: serializedKey }));
+console.error(
+  JSON.stringify({
+    message: "image transform failed",
+    key,
+    error: String(error),
+  }),
+);
+
+// 🔴 Bad
+console.log(`[Cache] HIT: ${serializedKey}`);
+console.error("Image transform failed:", error);
+```
+
+关键业务日志（请求入口、错误、重要事件）使用结构化格式，开发调试日志可保持原样。
+
 ## 命名规范
 
 | 类型             | 规范                 | 示例               |

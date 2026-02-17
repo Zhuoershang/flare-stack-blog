@@ -211,6 +211,22 @@ const domain = env.DOMAIN;
 - `.dev.vars`: Local development (not committed)
 - Cloudflare Dashboard / Wrangler Secrets: Production
 
+## Structured Logging
+
+Use JSON format for logs to enable search/filtering in Workers Observability:
+
+```typescript
+// ✅ Good
+console.log(JSON.stringify({ message: "cache hit", key: serializedKey }));
+console.error(JSON.stringify({ message: "image transform failed", key, error: String(error) }));
+
+// 🔴 Bad
+console.log(`[Cache] HIT: ${serializedKey}`);
+console.error("Image transform failed:", error);
+```
+
+Use structured logging for request entry/exit, errors, and important business events. Development debug logs can remain as-is.
+
 ## Code Quality Checks
 
 After any code changes, **always** run:
