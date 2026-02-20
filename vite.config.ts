@@ -9,9 +9,10 @@ import viteTsConfigPaths from "vite-tsconfig-paths";
 import { z } from "zod";
 import packageJson from "./package.json";
 
-// 添加新主题，这里需要同步更新
+import { themeNames, themes } from "./src/features/theme/config";
+
 const buildEnvSchema = z.object({
-  THEME: z.enum(["default", "fuwari"]).default("default"),
+  THEME: z.enum(themeNames).default("default"),
 });
 
 const config = defineConfig(({ mode }) => {
@@ -20,6 +21,7 @@ const config = defineConfig(({ mode }) => {
   return {
     define: {
       __APP_VERSION__: JSON.stringify(packageJson.version),
+      __THEME_CONFIG__: JSON.stringify(themes[buildEnv.THEME]),
     },
     resolve: {
       alias: {

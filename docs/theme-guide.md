@@ -248,14 +248,25 @@ export default {
 
 ### Step 5：注册主题并启动
 
-打开 `vite.config.ts`，在 `buildEnvSchema` 中将你的主题名加入枚举：
+打开 `src/features/theme/config.ts`，在 `themeNames` 中将你的主题名加入枚举：
 
 ```ts
-// vite.config.ts
-const buildEnvSchema = z.object({
-  // 在此处添加新主题名称
-  THEME: z.enum(["default", "my-theme"]).default("default"),
-});
+// src/features/theme/config.ts
+export const themeNames = ["default", "my-theme"] as const;
+export type ThemeName = (typeof themeNames)[number];
+
+export interface ThemeConfig {
+  viewTransition: boolean;
+}
+
+export const themes: Record<ThemeName, ThemeConfig> = {
+  default: {
+    viewTransition: true,
+  },
+  my-theme: {
+    viewTransition: false,
+  },
+};
 ```
 
 然后通过 `THEME` 环境变量在构建和开发时切换主题。
