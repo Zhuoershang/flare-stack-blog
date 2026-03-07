@@ -13,6 +13,10 @@
       "pattern": "zers.xian5.de5.net",
       "custom_domain": true,
     },
+    {
+      "pattern": "blog.xian5.de5.net",
+      "custom_domain": true,
+    },
   ],
   "d1_databases": [
     {
