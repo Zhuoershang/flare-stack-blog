@@ -1,8 +1,9 @@
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import type { CommentStatus, PostStatus } from "../src/lib/db/schema";
-import { COMMENT_STATUSES, POST_STATUSES } from "../src/lib/db/schema";
+import type { CommentStatus, PostStatus } from "../../src/lib/db/schema";
+import { COMMENT_STATUSES, POST_STATUSES } from "../../src/lib/db/schema";
+import { parseWranglerJson } from "./parse-wrangler-json";
 
 type D1ExecuteResult<Row> = Array<{
   results: Array<Row>;
@@ -122,10 +123,10 @@ function printHelp() {
   console.log(`Safe D1 migration runner
 
 Usage:
-  bun scripts/safe-d1-migrate.ts [DB_BINDING]
-  bun scripts/safe-d1-migrate.ts --db DB_BINDING --remote
-  bun scripts/safe-d1-migrate.ts --db DB_BINDING --remote [--with-export]
-  bun scripts/safe-d1-migrate.ts --db DB_BINDING --local [--persist-to .wrangler/state]
+  bun scripts/safe-d1-migrate/main.ts [DB_BINDING]
+  bun scripts/safe-d1-migrate/main.ts --db DB_BINDING --remote
+  bun scripts/safe-d1-migrate/main.ts --db DB_BINDING --remote [--with-export]
+  bun scripts/safe-d1-migrate/main.ts --db DB_BINDING --local [--persist-to .wrangler/state]
 
 Options:
   --remote         Migrate a remote D1 database and auto-rollback with Time Travel on verification failure
@@ -191,7 +192,7 @@ function runWrangler(args: Array<string>) {
 
 function runWranglerJson<T>(args: Array<string>) {
   const output = runWrangler([...args, "--json"]);
-  return JSON.parse(output) as T;
+  return parseWranglerJson<T>(output);
 }
 
 function d1ScopeArgs(target: Target, persistTo?: string) {
@@ -317,9 +318,11 @@ function diffSummary(before: SafetySummary, after: SafetySummary) {
   const diffs: Array<string> = [];
 
   for (const section of ["posts", "comments"] as const) {
-    for (const [key, beforeValue] of Object.entries(before[section])) {
-      const afterValue =
-        after[section][key as keyof (typeof after)[typeof section]];
+    const beforeSection = before[section] as Record<string, number>;
+    const afterSection = after[section] as Record<string, number>;
+
+    for (const [key, beforeValue] of Object.entries(beforeSection)) {
+      const afterValue = afterSection[key];
       if (beforeValue !== afterValue) {
         diffs.push(`${section}.${key}: ${beforeValue} -> ${afterValue}`);
       }
@@ -590,7 +593,9 @@ async function main() {
   }
 }
 
-void main().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exit(1);
-});
+if (import.meta.main) {
+  void main().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  });
+}

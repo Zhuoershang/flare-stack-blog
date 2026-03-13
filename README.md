@@ -291,7 +291,7 @@ bun dev
 安全脚本还会额外做这些事情：
 
 - 远程模式：默认只记录 D1 Time Travel bookmark，校验失败时自动执行 restore
-- 远程模式：如需额外保留 SQL 快照，可手动运行 `bun scripts/safe-d1-migrate.ts --remote --with-export`
+- 远程模式：如需额外保留 SQL 快照，可手动运行 `bun scripts/safe-d1-migrate/main.ts --remote --with-export`
 - 本地模式：快照 `.wrangler/state`（或你传入的 `--persist-to`），校验失败时自动恢复本地持久化目录
 
 ### 本地模拟 Cloudflare 资源

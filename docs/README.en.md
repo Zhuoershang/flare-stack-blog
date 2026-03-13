@@ -287,7 +287,7 @@ bun dev
 The safety script also adds these safeguards:
 
 - Remote mode: records a D1 Time Travel bookmark by default and automatically restores on verification failure
-- Remote mode: if you also want a SQL snapshot for manual incident analysis, run `bun scripts/safe-d1-migrate.ts --remote --with-export`
+- Remote mode: if you also want a SQL snapshot for manual incident analysis, run `bun scripts/safe-d1-migrate/main.ts --remote --with-export`
 - Local mode: snapshots `.wrangler/state` (or your custom `--persist-to` path) and restores it automatically on verification failure
 
 ### Simulating Cloudflare Resources Locally
