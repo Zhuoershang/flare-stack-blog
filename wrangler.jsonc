@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "flare-stack-blog",
   "compatibility_date": "2026-02-18",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "main": "./src/server.ts",
   "observability": {
     "enabled": false,
@@ -39,6 +39,11 @@
       "id": "1d038db038e04ec4aaed9a3221eec932",
       "remote": true,
     },
+    {
+      "binding": "OAUTH_KV",
+      "id": "1d038db038e04ec4aaed9a3221eec932",
+      "remote": true,
+    }
   ],
   "workflows": [
     {
