@@ -1,5 +1,8 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
-import { SOCIAL_PLATFORMS } from "@/features/config/utils/social-platforms";
+import {
+  resolveSocialHref,
+  SOCIAL_PLATFORMS,
+} from "@/features/config/utils/social-platforms";
 import type { NavOption } from "@/features/theme/contract/layouts";
 import { m } from "@/paraglide/messages";
 
@@ -40,10 +43,7 @@ export function Footer({ navOptions }: FooterProps) {
           {siteConfig.social
             .filter((link) => link.url)
             .map((link, i) => {
-              const href =
-                link.platform === "email" && !link.url.startsWith("mailto:")
-                  ? `mailto:${link.url}`
-                  : link.url;
+              const href = resolveSocialHref(link.platform, link.url);
               const label =
                 link.platform !== "custom"
                   ? SOCIAL_PLATFORMS[link.platform].label

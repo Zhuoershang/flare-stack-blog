@@ -1,7 +1,10 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
 import { Terminal } from "lucide-react";
 import { useMemo } from "react";
-import { SOCIAL_PLATFORMS } from "@/features/config/utils/social-platforms";
+import {
+  resolveSocialHref,
+  SOCIAL_PLATFORMS,
+} from "@/features/config/utils/social-platforms";
 import { useViewCounts } from "@/features/pageview/queries";
 import type { HomePageProps } from "@/features/theme/contract/pages";
 import { PostItem } from "@/features/theme/themes/default/components/post-item";
@@ -63,10 +66,7 @@ export function HomePage({ posts, pinnedPosts }: HomePageProps) {
                   : null;
               const Icon = preset?.icon;
               const label = preset?.label ?? link.label ?? "";
-              const href =
-                link.platform === "email" && !link.url.startsWith("mailto:")
-                  ? `mailto:${link.url}`
-                  : link.url;
+              const href = resolveSocialHref(link.platform, link.url);
 
               return (
                 <a

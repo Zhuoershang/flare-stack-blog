@@ -59,6 +59,24 @@ function BilibiliIcon({
   );
 }
 
+export function resolveSocialHref(
+  platform: SocialPlatform,
+  url: string,
+): string {
+  if (platform === "email") {
+    return url.startsWith("mailto:") ? url : `mailto:${url}`;
+  }
+  if (
+    platform === "rss" ||
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("/")
+  ) {
+    return url;
+  }
+  return `https://${url}`;
+}
+
 interface PlatformMeta {
   icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
   label: string;

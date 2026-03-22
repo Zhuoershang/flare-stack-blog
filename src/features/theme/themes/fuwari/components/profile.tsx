@@ -1,5 +1,8 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
-import { SOCIAL_PLATFORMS } from "@/features/config/utils/social-platforms";
+import {
+  resolveSocialHref,
+  SOCIAL_PLATFORMS,
+} from "@/features/config/utils/social-platforms";
 import { m } from "@/paraglide/messages";
 
 export function Profile() {
@@ -40,10 +43,7 @@ export function Profile() {
                   : null;
               const Icon = preset?.icon;
               const label = preset?.label ?? link.label ?? "";
-              const href =
-                link.platform === "email" && !link.url.startsWith("mailto:")
-                  ? `mailto:${link.url}`
-                  : link.url;
+              const href = resolveSocialHref(link.platform, link.url);
 
               return (
                 <a
