@@ -15,9 +15,10 @@ export async function getPopularPosts(
   const thirtyDaysAgo = new Date(now);
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+  const version = await CacheService.getVersion(context, "posts:list");
   return CacheService.get(
     context,
-    [...PAGEVIEW_CACHE_KEYS.popular, limit],
+    [version, ...PAGEVIEW_CACHE_KEYS.popular, limit],
     PostItemSchema.array(),
     async () => {
       const topPages = await PageviewRepo.getTopPages(
