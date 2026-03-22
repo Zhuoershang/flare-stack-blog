@@ -1,4 +1,5 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
+import { SOCIAL_PLATFORMS } from "@/features/config/utils/social-platforms";
 import type { NavOption } from "@/features/theme/contract/layouts";
 import { m } from "@/paraglide/messages";
 
@@ -36,20 +37,29 @@ export function Footer({ navOptions }: FooterProps) {
               {option.label}
             </Link>
           ))}
-          <a
-            href={siteConfig.social.github}
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-foreground transition-colors"
-          >
-            Github
-          </a>
-          <a
-            href={`mailto:${siteConfig.social.email}`}
-            className="hover:text-foreground transition-colors"
-          >
-            Email
-          </a>
+          {siteConfig.social
+            .filter((link) => link.url)
+            .map((link, i) => {
+              const href =
+                link.platform === "email" && !link.url.startsWith("mailto:")
+                  ? `mailto:${link.url}`
+                  : link.url;
+              const label =
+                link.platform !== "custom"
+                  ? SOCIAL_PLATFORMS[link.platform].label
+                  : (link.label ?? "");
+              return (
+                <a
+                  key={`${link.platform}-${i}`}
+                  href={href}
+                  target={link.platform === "email" ? undefined : "_blank"}
+                  rel={link.platform === "email" ? undefined : "noreferrer"}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {label}
+                </a>
+              );
+            })}
         </nav>
       </div>
     </footer>
