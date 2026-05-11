@@ -16,17 +16,15 @@ function getOAuthProps(ctx: ExecutionContext): OAuthProps {
   return maybeContext.props ?? {};
 }
 
-// ---------- 新增：API Key 认证相关函数 ----------
+// ---------- API Key 认证辅助函数 ----------
 function extractBearerToken(request: Request): string | null {
   const authHeader = request.headers.get("Authorization");
   if (!authHeader) return null;
-
   const parts = authHeader.split(" ");
   if (parts.length === 2 && parts[0].toLowerCase() === "bearer") {
     return parts[1];
   }
-  // 不支持其他 scheme，直接返回 null
-  return null;
+  return null; // 只支持 Bearer 方案
 }
 
 function timingSafeEqual(a: string, b: string): boolean {
@@ -46,7 +44,7 @@ function createApiKeyPrincipal() {
     roles: ["mcp_access"],
   };
 }
-// ------------------------------------------------
+// -------------------------------------------
 
 export class McpApiHandler extends WorkerEntrypoint<Env> {
   async fetch(request: Request) {
@@ -57,16 +55,15 @@ export class McpApiHandler extends WorkerEntrypoint<Env> {
 
     const executionCtx = this.ctx as ExecutionContext;
 
-    // 2. 尝试提取 API Key
+    // 2. 提取 API Key 并判断是否提供了 Authorization 头
     const apiKey = extractBearerToken(request);
     const hasAuthHeader = request.headers.has("Authorization");
 
     // 3. API Key 认证分支
     if (hasAuthHeader) {
-      // 必须提供有效的 API Key，否则拒绝
       const expectedKey = this.env.MCP_API_KEY;
       if (!expectedKey) {
-        console.warn("MCP_API_KEY not set in environment, but Authorization header provided.");
+        console.warn("MCP_API_KEY not set, but Authorization header provided.");
         return new Response("Unauthorized: API Key not configured", { status: 401 });
       }
 
@@ -74,8 +71,14 @@ export class McpApiHandler extends WorkerEntrypoint<Env> {
         return new Response("Unauthorized: Invalid API Key", { status: 401 });
       }
 
-      // 有效 API Key → 使用 API Key 主体
+      // API Key 有效 → 创建主体验证通过
       const principal = createApiKeyPrincipal();
+
+      // 关键：移除原始请求中的 Authorization 头，避免 createMcpHandler 再次将其作为 OAuth Bearer Token 校验
+      const newHeaders = new Headers(request.headers);
+      newHeaders.delete("Authorization");
+      const newRequest = new Request(request, { headers: newHeaders });
+
       const db = getDb(this.env);
       const server = await createMcpServer({
         db,
@@ -88,17 +91,17 @@ export class McpApiHandler extends WorkerEntrypoint<Env> {
         server as unknown as Parameters<typeof createMcpHandler>[0],
         {
           authContext: {
-            // 不传递原始 API Key，仅传递认证方式元信息
             authMethod: "api_key",
+            // 可以额外传递一些元信息，但不传递原始密钥
           },
           route: "/mcp",
         },
-      )(request, this.env, executionCtx);
+      )(newRequest, this.env, executionCtx);
 
       return applyMcpOriginPolicy(request, response);
     }
 
-    // 4. 无 Authorization 头 → 原有 OAuth 流程
+    // 4. 没有 Authorization 头 → 走原有的 OAuth 流程（保持不变）
     const authProps = getOAuthProps(executionCtx);
     const db = getDb(this.env);
     const server = await createMcpServer({
