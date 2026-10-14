@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { LogOut, Settings, User as UserIcon } from "lucide-react";
+import { ChevronDown, LogOut, Settings, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/components/common/theme-provider";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import type { NavOption, UserInfo } from "@/components/layout/layout-props";
+import { cn } from "@/lib/utils";
 import { PublicNavLink } from "./public-nav-link";
 import { m } from "@/paraglide/messages";
 import { getLocale, setLocale } from "@/paraglide/runtime";
@@ -15,6 +16,56 @@ interface MobileMenuProps {
   logout: () => Promise<void>;
   mobile: boolean;
   isLoading?: boolean;
+}
+
+function MobileNavGroup({
+  option,
+  onClose,
+}: {
+  option: NavOption;
+  onClose: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const children = option.children ?? [];
+
+  return (
+    <div className="public-menu-group" data-open={open}>
+      <div className="public-menu-group-head">
+        {option.href ? (
+          <PublicNavLink
+            option={{ ...option, children: undefined }}
+            onClick={onClose}
+            className="public-menu-item"
+            activeClassName="public-menu-active"
+          />
+        ) : (
+          <span className="public-menu-item public-menu-group-label">
+            {option.label}
+          </span>
+        )}
+        <button
+          type="button"
+          className="public-menu-group-toggle"
+          aria-expanded={open}
+          aria-label={option.label}
+          onClick={() => setOpen((value) => !value)}
+        >
+          <ChevronDown size={18} strokeWidth={2} />
+        </button>
+      </div>
+      <div className="public-menu-group-children" data-open={open} hidden={!open}>
+        {children.map((child) => (
+          <PublicNavLink
+            key={child.id}
+            option={child}
+            onClick={onClose}
+            className="public-menu-item public-menu-child"
+            activeClassName="public-menu-active"
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /** Shared account actions; the compact navigation also includes links and preferences. */
@@ -39,15 +90,23 @@ export function MobileMenu({
       {mobile && (
         <>
           <nav className="public-menu-links">
-            {navOptions.map((option) => (
-              <PublicNavLink
-                key={option.id}
-                option={option}
-                onClick={onClose}
-                className="public-menu-item"
-                activeClassName="public-menu-active"
-              />
-            ))}
+            {navOptions.map((option) =>
+              option.children && option.children.length > 0 ? (
+                <MobileNavGroup
+                  key={option.id}
+                  option={option}
+                  onClose={onClose}
+                />
+              ) : (
+                <PublicNavLink
+                  key={option.id}
+                  option={option}
+                  onClick={onClose}
+                  className="public-menu-item"
+                  activeClassName="public-menu-active"
+                />
+              ),
+            )}
           </nav>
           <div className="public-menu-preferences">
             <ThemeToggle className="public-menu-theme" label={themeLabel} />

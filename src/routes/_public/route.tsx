@@ -11,7 +11,9 @@ import { useLogout } from "@/features/auth/hooks/use-logout";
 import { authClient } from "@/lib/auth/auth.client";
 import { CACHE_CONTROL } from "@/lib/constants";
 import { clientEnv } from "@/lib/env/client.env";
+import type { NavOption } from "@/components/layout/layout-props";
 import { isExternalNavHref } from "@/features/config/utils/nav-links";
+import type { NavLink } from "@/features/config/utils/nav-links";
 import { m } from "@/paraglide/messages";
 
 export const Route = createFileRoute("/_public")({
@@ -35,6 +37,25 @@ export const Route = createFileRoute("/_public")({
   },
 });
 
+function toNavOptions(
+  links: readonly NavLink[],
+  idPrefix: string,
+): Array<NavOption> {
+  return links.map((link, index) => {
+    const id = `${idPrefix}-${index}`;
+    const children = link.children?.length
+      ? toNavOptions(link.children, id)
+      : undefined;
+    return {
+      id,
+      label: link.label,
+      href: link.href,
+      external: isExternalNavHref(link.href),
+      children,
+    };
+  });
+}
+
 function PublicLayout() {
   const navigate = useNavigate();
   const { siteConfig } = useRouteContext({ from: "__root__" });
@@ -42,7 +63,7 @@ function PublicLayout() {
     authClient.useSession();
   const { logout } = useLogout();
 
-  const navOptions = [
+  const navOptions: Array<NavOption> = [
     { id: "home", label: m.nav_home(), href: "/", external: false },
     { id: "posts", label: m.nav_posts(), href: "/posts", external: false },
     {
@@ -51,12 +72,7 @@ function PublicLayout() {
       href: "/friend-links",
       external: false,
     },
-    ...siteConfig.navLinks.map((link, index) => ({
-      id: `custom-${index}`,
-      label: link.label,
-      href: link.href,
-      external: isExternalNavHref(link.href),
-    })),
+    ...toNavOptions(siteConfig.navLinks, "custom"),
   ];
 
   // Global shortcut: Cmd/Ctrl + K to navigate to search

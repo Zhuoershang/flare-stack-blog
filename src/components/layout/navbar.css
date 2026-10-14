@@ -73,6 +73,78 @@
   background: var(--fuwari-btn-regular-bg);
   color: var(--fuwari-primary);
 }
+.public-nav-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.public-nav-group-trigger {
+  display: flex;
+  align-items: center;
+}
+.public-nav-group-label {
+  display: flex;
+  align-items: center;
+  color: var(--fuwari-fg-75);
+  font-weight: 700;
+}
+.public-nav-group-caret {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -6px;
+  padding: 4px;
+  border-radius: 8px;
+  color: var(--fuwari-fg-50);
+  background: transparent;
+  transition:
+    background-color 180ms,
+    color 180ms;
+}
+.public-nav-group[data-open="true"] > .public-nav-group-trigger,
+.public-nav-group-trigger:hover {
+  color: var(--fuwari-primary);
+}
+.public-nav-group-caret:hover {
+  background: var(--fuwari-btn-regular-bg);
+  color: var(--fuwari-primary);
+}
+.public-nav-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  display: none;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--fuwari-card-bg);
+  box-shadow: 0 8px 32px #0000001f;
+}
+.public-nav-dropdown[data-open="true"] {
+  display: flex;
+}
+.public-nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: var(--fuwari-fg-75);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 180ms,
+    color 180ms;
+}
+.public-nav-dropdown-item:hover,
+.public-nav-dropdown-item.public-nav-active {
+  background: var(--fuwari-btn-regular-bg);
+  color: var(--fuwari-primary);
+}
 .public-nav-tools,
 .public-desktop-tools {
   display: flex;
@@ -185,6 +257,53 @@
 }
 .public-menu-item:disabled {
   opacity: 0.5;
+}
+.public-menu-group {
+  display: flex;
+  flex-direction: column;
+}
+.public-menu-group-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.public-menu-group-head .public-menu-item {
+  flex: 1;
+  min-width: 0;
+}
+.public-menu-group-label {
+  color: var(--fuwari-fg-75);
+}
+.public-menu-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: var(--fuwari-fg-50);
+  background: transparent;
+  transition:
+    background-color 180ms,
+    color 180ms,
+    transform 180ms;
+}
+.public-menu-group-toggle:hover {
+  background: var(--fuwari-btn-regular-bg);
+  color: var(--fuwari-primary);
+}
+.public-menu-group[data-open="true"] .public-menu-group-toggle {
+  transform: rotate(180deg);
+  color: var(--fuwari-primary);
+}
+.public-menu-group-children {
+  display: flex;
+  flex-direction: column;
+  padding-left: 14px;
+}
+.public-menu-child {
+  min-height: 40px;
+  font-weight: 500;
 }
 .public-menu-identity {
   display: flex;

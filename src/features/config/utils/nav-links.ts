@@ -1,9 +1,11 @@
-export const NAV_LINKS_MAX = 5;
+export const NAV_LINKS_MAX = 8;
+export const NAV_CHILDREN_MAX = 8;
 export const NAV_LINK_LABEL_MAX = 20;
 
 export type NavLink = {
   label: string;
   href: string;
+  children?: NavLink[];
 };
 
 export function isExternalNavHref(href: string): boolean {
@@ -41,23 +43,44 @@ export function canonicalizeNavHref(href: string): string {
   return trimmed;
 }
 
-export function normalizeNavLinks(value: unknown): NavLink[] {
+function normalizeNavLink(value: unknown): NavLink | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as {
+    label?: unknown;
+    href?: unknown;
+    children?: unknown;
+  };
+  const label = typeof record.label === "string" ? record.label.trim() : "";
+  const href = canonicalizeNavHref(
+    typeof record.href === "string" ? record.href : "",
+  );
+  if (!label) return null;
+
+  const children = normalizeNavLinks(record.children, NAV_CHILDREN_MAX);
+  const hasHref = isNavHref(href);
+  // A parent may act as a pure group (no own link) as long as it has children.
+  if (!hasHref && children.length === 0) return null;
+
+  const link: NavLink = {
+    label: label.slice(0, NAV_LINK_LABEL_MAX),
+    href: hasHref ? href : "",
+  };
+  if (children.length > 0) link.children = children;
+  return link;
+}
+
+export function normalizeNavLinks(
+  value: unknown,
+  max: number = NAV_LINKS_MAX,
+): NavLink[] {
   if (!Array.isArray(value)) return [];
 
   const links: NavLink[] = [];
   for (const item of value) {
-    if (!item || typeof item !== "object") continue;
-    const record = item as { label?: unknown; href?: unknown };
-    const label = typeof record.label === "string" ? record.label.trim() : "";
-    const href = canonicalizeNavHref(
-      typeof record.href === "string" ? record.href : "",
-    );
-    if (!label || !isNavHref(href)) continue;
-    links.push({
-      label: label.slice(0, NAV_LINK_LABEL_MAX),
-      href,
-    });
-    if (links.length >= NAV_LINKS_MAX) break;
+    const link = normalizeNavLink(item);
+    if (!link) continue;
+    links.push(link);
+    if (links.length >= max) break;
   }
   return links;
 }

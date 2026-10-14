@@ -3,8 +3,10 @@ import type { Messages } from "@/lib/i18n";
 import {
   canonicalizeNavHref,
   isNavHref,
+  NAV_CHILDREN_MAX,
   NAV_LINK_LABEL_MAX,
   NAV_LINKS_MAX,
+  type NavLink,
 } from "./utils/nav-links";
 import { SOCIAL_PLATFORM_KEYS } from "./utils/social-platforms";
 
@@ -22,61 +24,91 @@ function createSiteTextSchema(max: number) {
   return z.string().trim().max(max);
 }
 
-const NavLinkSchema = z.object({
-  label: createSiteTextSchema(NAV_LINK_LABEL_MAX).pipe(z.string().min(1)),
-  href: z.string().trim().refine(isNavHref, {
-    message: "Please enter a root-relative path or http(s) URL",
-  }),
-});
+const NavLinkSchema: z.ZodType<NavLink> = z.lazy(() =>
+  z
+    .object({
+      label: createSiteTextSchema(NAV_LINK_LABEL_MAX).pipe(z.string().min(1)),
+      href: z.string().trim(),
+      children: z.array(NavLinkSchema).max(NAV_CHILDREN_MAX).optional(),
+    })
+    .superRefine((link, ctx) => {
+      const hasChildren = (link.children?.length ?? 0) > 0;
+      if (!link.href && !hasChildren) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please enter a root-relative path or http(s) URL",
+          path: ["href"],
+        });
+      } else if (link.href && !isNavHref(link.href)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Please enter a root-relative path or http(s) URL",
+          path: ["href"],
+        });
+      }
+    }),
+);
 
-function createNavLinksFormSchema(messages: Messages) {
+function createNavLinkNodeFormSchema(messages: Messages): z.ZodType<NavLink> {
   return z
-    .array(
-      z.object({
-        label: z.string(),
-        href: z.string(),
-      }),
-    )
-    .max(NAV_LINKS_MAX)
-    .transform((links) =>
-      links.map((link) => ({
+    .object({
+      label: z.string(),
+      href: z.string(),
+      children: z
+        .array(createNavLinkNodeFormSchema(messages))
+        .max(NAV_CHILDREN_MAX)
+        .optional(),
+    })
+    .transform((link) => {
+      const children = link.children ?? [];
+      const result: NavLink = {
         label: link.label.trim(),
         href: canonicalizeNavHref(link.href),
-      })),
-    )
-    .superRefine((links, ctx) => {
-      links.forEach((link, index) => {
-        if (!link.label && !link.href) return;
-        if (!link.label) {
-          ctx.addIssue({
-            code: "custom",
-            message: messages.settings_site_validation_nav_label_required(),
-            path: [index, "label"],
-          });
-        } else if (link.label.length > NAV_LINK_LABEL_MAX) {
-          ctx.addIssue({
-            code: "custom",
-            message: messages.settings_site_validation_too_long({
-              max: NAV_LINK_LABEL_MAX,
-            }),
-            path: [index, "label"],
-          });
-        }
-        if (!link.href) {
+      };
+      if (children.length > 0) {
+        result.children = children;
+      }
+      return result;
+    })
+    .superRefine((link, ctx) => {
+      const hasChildren = (link.children?.length ?? 0) > 0;
+      if (!link.label && !link.href && !hasChildren) return;
+      if (!link.label) {
+        ctx.addIssue({
+          code: "custom",
+          message: messages.settings_site_validation_nav_label_required(),
+          path: ["label"],
+        });
+      } else if (link.label.length > NAV_LINK_LABEL_MAX) {
+        ctx.addIssue({
+          code: "custom",
+          message: messages.settings_site_validation_too_long({
+            max: NAV_LINK_LABEL_MAX,
+          }),
+          path: ["label"],
+        });
+      }
+      if (!link.href) {
+        // A parent menu may act as a pure group (no own link) if it has children.
+        if (!hasChildren) {
           ctx.addIssue({
             code: "custom",
             message: messages.settings_site_validation_nav_href_required(),
-            path: [index, "href"],
-          });
-        } else if (!isNavHref(link.href)) {
-          ctx.addIssue({
-            code: "custom",
-            message: messages.settings_site_validation_invalid_nav_href(),
-            path: [index, "href"],
+            path: ["href"],
           });
         }
-      });
+      } else if (!isNavHref(link.href)) {
+        ctx.addIssue({
+          code: "custom",
+          message: messages.settings_site_validation_invalid_nav_href(),
+          path: ["href"],
+        });
+      }
     });
+}
+
+function createNavLinksFormSchema(messages: Messages) {
+  return z.array(createNavLinkNodeFormSchema(messages)).max(NAV_LINKS_MAX);
 }
 
 function createSiteTextFormSchema(max: number, messages: Messages) {

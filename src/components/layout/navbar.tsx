@@ -7,7 +7,7 @@ import type { NavOption, UserInfo } from "./layout-props";
 import { MOTION, useMotionPresence } from "@/hooks/use-motion";
 import { m } from "@/paraglide/messages";
 import { LanguageSwitcher } from "./language-switcher";
-import { PublicNavLink } from "./public-nav-link";
+import { PublicNavMenu } from "./public-nav-link";
 import { MobileMenu } from "./mobile-menu";
 import "./navbar.css";
 
@@ -129,7 +129,7 @@ export function Navbar({
         </Link>
         <nav className="public-desktop-links">
           {navOptions.map((option) => (
-            <PublicNavLink
+            <PublicNavMenu
               key={option.id}
               option={option}
               className="public-nav-link"

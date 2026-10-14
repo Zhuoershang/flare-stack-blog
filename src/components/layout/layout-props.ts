@@ -5,6 +5,7 @@ export interface NavOption {
   label: string;
   href: string;
   external: boolean;
+  children?: Array<NavOption>;
 }
 
 export interface UserInfo {
