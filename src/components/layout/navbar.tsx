@@ -32,6 +32,7 @@ export function Navbar({
   const [isHidden, setIsHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [mobile, setMobile] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const present = useMotionPresence(open, MOTION.popover);
   const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -40,6 +41,7 @@ export function Navbar({
   useEffect(() => {
     setOpen(false);
     setIsHidden(false);
+    setOpenDropdownId(null);
   }, [pathname]);
   useEffect(() => {
     let previous = Math.max(0, window.scrollY);
@@ -135,6 +137,8 @@ export function Navbar({
               option={option}
               className="public-nav-link"
               activeClassName="public-nav-active"
+              openId={openDropdownId}
+              onOpenIdChange={setOpenDropdownId}
             />
           ))}
         </nav>

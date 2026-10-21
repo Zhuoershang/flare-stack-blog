@@ -12,19 +12,22 @@ import { getLocale, setLocale } from "@/paraglide/runtime";
 
 function NavAccordionGroup({
   option,
+  open,
+  onOpenChange,
   onClose,
 }: {
   option: NavOption;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onClose: () => void;
 }) {
-  const [open, setOpen] = useState(false);
   return (
     <div className="public-menu-group" data-open={open}>
       <button
         type="button"
         className="public-menu-item public-menu-group-trigger"
         aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => onOpenChange(!open)}
       >
         <span className="truncate">{option.label}</span>
         <ChevronDown size={16} className="public-menu-group-chevron" />
@@ -65,6 +68,7 @@ export function MobileMenu({
   isLoading,
 }: MobileMenuProps) {
   const [loggingOut, setLoggingOut] = useState(false);
+  const [openGroupId, setOpenGroupId] = useState<string | null>(null);
   const { userTheme } = useTheme();
   const themeLabel =
     userTheme === "light"
@@ -82,6 +86,10 @@ export function MobileMenu({
                 <NavAccordionGroup
                   key={option.id}
                   option={option}
+                  open={openGroupId === option.id}
+                  onOpenChange={(open) =>
+                    setOpenGroupId(open ? option.id : null)
+                  }
                   onClose={onClose}
                 />
               ) : (

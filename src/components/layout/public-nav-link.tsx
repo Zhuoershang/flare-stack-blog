@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, ExternalLink } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { NavOption } from "@/components/layout/layout-props";
 
 const STATIC_HREF = {
@@ -20,15 +20,31 @@ export function PublicNavLink({
   className,
   activeClassName,
   onClick,
+  openId,
+  onOpenIdChange,
 }: {
   option: NavOption;
   className?: string;
   activeClassName?: string;
   onClick?: () => void;
+  /** Shared id of the currently open dropdown; controlled by the navbar. */
+  openId?: string | null;
+  onOpenIdChange?: (openId: string | null) => void;
 }) {
   if (option.children && option.children.length > 0) {
+    if (!openId || !onOpenIdChange) {
+      throw new Error(
+        "PublicNavLink: dropdown items require openId and onOpenIdChange",
+      );
+    }
     return (
-      <NavDropdown option={option} className={className} onClick={onClick} />
+      <NavDropdown
+        option={option}
+        className={className}
+        onClick={onClick}
+        open={openId === option.id}
+        onOpenChange={(open) => onOpenIdChange(open ? option.id : null)}
+      />
     );
   }
 
@@ -99,7 +115,8 @@ export function PublicNavLink({
   );
 }
 
-function NavDropdown({
+/** Leaf link inside a dropdown panel — submenus only nest one level deep. */
+function DropdownLeaf({
   option,
   className,
   onClick,
@@ -108,17 +125,39 @@ function NavDropdown({
   className?: string;
   onClick?: () => void;
 }) {
-  const [open, setOpen] = useState(false);
+  return (
+    <PublicNavLink
+      option={{ ...option, children: undefined }}
+      className={className}
+      onClick={onClick}
+    />
+  );
+}
+
+function NavDropdown({
+  option,
+  className,
+  onClick,
+  open,
+  onOpenChange,
+}: {
+  option: NavOption;
+  className?: string;
+  onClick?: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const pointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!rootRef.current?.contains(event.target as Node))
+        onOpenChange(false);
     };
     const key = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      setOpen(false);
+      onOpenChange(false);
     };
     document.addEventListener("pointerdown", pointer);
     document.addEventListener("keydown", key);
@@ -126,7 +165,7 @@ function NavDropdown({
       document.removeEventListener("pointerdown", pointer);
       document.removeEventListener("keydown", key);
     };
-  }, [open]);
+  }, [open, onOpenChange]);
 
   return (
     <div
@@ -139,7 +178,7 @@ function NavDropdown({
         className={`${className ?? ""} public-nav-dropdown-trigger`}
         aria-expanded={open}
         aria-haspopup="true"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => onOpenChange(!open)}
       >
         <span className="truncate">{option.label}</span>
         <ChevronDown
@@ -151,12 +190,12 @@ function NavDropdown({
       {open && (
         <div className="public-nav-dropdown-panel" role="menu">
           {option.children?.map((child) => (
-            <PublicNavLink
+            <DropdownLeaf
               key={child.id}
               option={child}
               className="public-nav-dropdown-item"
               onClick={() => {
-                setOpen(false);
+                onOpenChange(false);
                 onClick?.();
               }}
             />
