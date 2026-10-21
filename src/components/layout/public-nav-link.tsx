@@ -133,11 +133,6 @@ function NavDropdown({
       ref={rootRef}
       className="public-nav-dropdown"
       data-open={open}
-      onPointerEnter={() => setOpen(true)}
-      onPointerLeave={(event) => {
-        if (!rootRef.current?.contains(event.relatedTarget as Node))
-          setOpen(false);
-      }}
     >
       <button
         type="button"

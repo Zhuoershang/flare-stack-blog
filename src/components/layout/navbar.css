@@ -96,7 +96,8 @@
 }
 .public-nav-dropdown-panel {
   position: absolute;
-  top: calc(100% + 6px);
+  top: 100%;
+  margin-top: 6px;
   left: 0;
   z-index: 55;
   min-width: 180px;

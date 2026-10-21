@@ -807,6 +807,7 @@
   "settings_site_nav_label_ph": "如：关于",
   "settings_site_nav_href_ph": "/about 或 https://...",
   "settings_site_nav_add": "添加导航项",
+  "settings_site_nav_child_hint": "每个菜单项最多可添加 8 个子菜单，将在前台二级下拉菜单中显示。",
   "settings_site_nav_child_add": "添加子菜单",
   "settings_site_nav_child_name": "子菜单名称",
   "settings_site_nav_child_url": "子菜单跳转链接",

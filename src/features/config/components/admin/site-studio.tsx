@@ -2,7 +2,7 @@ import { useNavSort } from "./use-nav-sort";
 import { SettingsDisclosure } from "./settings-disclosure";
 import "./site-studio.css";
 import {
-  CornerDownRight,
+  ListTree,
   ExternalLink,
   GripVertical,
   Pencil,
@@ -220,15 +220,12 @@ export function SiteStudio() {
     </div>
   );
 }
-
 function NavLinksEditor() {
-  const { control, register, setValue, watch, formState } =
-    useFormContext<SystemConfig>();
+  const { control } = useFormContext<SystemConfig>();
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: "site.navLinks",
   });
-  const linkErrors = formState.errors.site?.navLinks;
   const sorting = useNavSort(
     fields.map((field) => field.id),
     move,
@@ -245,92 +242,16 @@ function NavLinksEditor() {
 
       <p className="site-sort-hint">{m.settings_nav_drag_hint()}</p>
       <div className="site-nav-fields">
-        {fields.map((field, index) => {
-          const href = watch(`site.navLinks.${index}.href`) ?? "";
-          const canonicalHref = canonicalizeNavHref(href);
-          const labelError = linkErrors?.[index]?.label?.message;
-          const hrefError = linkErrors?.[index]?.href?.message;
-          return (
-            <div
-              key={field.id}
-              ref={(node) => {
-                if (node) sorting.rows.current.set(field.id, node);
-                else sorting.rows.current.delete(field.id);
-              }}
-              className="site-nav-item space-y-1"
-              data-dragging={sorting.drag?.id === field.id}
-              data-drop-target={
-                sorting.drag?.target === field.id &&
-                sorting.drag?.id !== field.id
-              }
-              style={
-                sorting.drag?.id === field.id
-                  ? { transform: `translateY(${sorting.drag.offset}px)` }
-                  : undefined
-              }
-            >
-              <div className="site-nav-row">
-                <button
-                  type="button"
-                  className="site-nav-handle"
-                  {...sorting.handleProps(field.id)}
-                  aria-label={m.settings_nav_drag_label({
-                    name:
-                      watch(`site.navLinks.${index}.label`) ||
-                      String(index + 1),
-                  })}
-                  title={m.settings_nav_drag_hint()}
-                  disabled={fields.length < 2}
-                >
-                  <GripVertical size={18} />
-                </button>
-                <Input
-                  {...register(`site.navLinks.${index}.label`)}
-                  placeholder={m.settings_site_nav_label_ph()}
-                  aria-label={m.settings_site_nav_name()}
-                />
-                <div className="relative min-w-0 flex-1">
-                  <Input
-                    {...register(`site.navLinks.${index}.href`, {
-                      onBlur: (event) => {
-                        const next = canonicalizeNavHref(event.target.value);
-                        if (next !== event.target.value) {
-                          setValue(`site.navLinks.${index}.href`, next, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          });
-                        }
-                      },
-                    })}
-                    aria-label={m.settings_site_nav_url()}
-                    placeholder={m.settings_site_nav_href_ph()}
-                    className={cn(isExternalNavHref(canonicalHref) && "pr-10")}
-                  />
-                  {isExternalNavHref(canonicalHref) ? (
-                    <ExternalLink
-                      size={14}
-                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 fuwari-text-30"
-                    />
-                  ) : null}
-                </div>
-                <IconButton
-                  size="md"
-                  tone="danger"
-                  onClick={() => remove(index)}
-                  label={m.settings_site_nav_remove()}
-                >
-                  <Trash2 size={16} />
-                </IconButton>
-              </div>
-              {labelError || hrefError ? (
-                <p className="fuwari-form-field-error">
-                  {hrefError || labelError}
-                </p>
-              ) : null}
-              <NavChildrenEditor parentIndex={index} />
-            </div>
-          );
-        })}
+        {fields.map((field, index) => (
+          <NavLinkItem
+            key={field.id}
+            index={index}
+            fieldId={field.id}
+            canReorder={fields.length > 1}
+            onRemove={() => remove(index)}
+            sorting={sorting}
+          />
+        ))}
       </div>
 
       {fields.length < NAV_LINKS_MAX ? (
@@ -348,6 +269,119 @@ function NavLinksEditor() {
   );
 }
 
+function NavLinkItem({
+  index,
+  fieldId,
+  canReorder,
+  onRemove,
+  sorting,
+}: {
+  index: number;
+  fieldId: string;
+  canReorder: boolean;
+  onRemove: () => void;
+  sorting: ReturnType<typeof useNavSort>;
+}) {
+  const { control, register, setValue, watch, formState } =
+    useFormContext<SystemConfig>();
+  const [open, setOpen] = useState(false);
+  const href = watch(`site.navLinks.${index}.href`) ?? "";
+  const canonicalHref = canonicalizeNavHref(href);
+  const childCount =
+    useWatch({
+      control,
+      name: `site.navLinks.${index}.children`,
+    })?.length ?? 0;
+  const itemErrors = formState.errors.site?.navLinks?.[index];
+  const labelError = itemErrors?.label?.message;
+  const hrefError = itemErrors?.href?.message;
+
+  return (
+    <div
+      ref={(node) => {
+        if (node) sorting.rows.current.set(fieldId, node);
+        else sorting.rows.current.delete(fieldId);
+      }}
+      className="site-nav-item space-y-1"
+      data-dragging={sorting.drag?.id === fieldId}
+      data-drop-target={
+        sorting.drag?.target === fieldId && sorting.drag?.id !== fieldId
+      }
+      style={
+        sorting.drag?.id === fieldId
+          ? { transform: `translateY(${sorting.drag.offset}px)` }
+          : undefined
+      }
+    >
+      <div className="site-nav-row">
+        <button
+          type="button"
+          className="site-nav-handle"
+          {...sorting.handleProps(fieldId)}
+          aria-label={m.settings_nav_drag_label({
+            name: watch(`site.navLinks.${index}.label`) || String(index + 1),
+          })}
+          title={m.settings_nav_drag_hint()}
+          disabled={!canReorder}
+        >
+          <GripVertical size={18} />
+        </button>
+        <Input
+          {...register(`site.navLinks.${index}.label`)}
+          placeholder={m.settings_site_nav_label_ph()}
+          aria-label={m.settings_site_nav_name()}
+        />
+        <div className="relative min-w-0 flex-1">
+          <Input
+            {...register(`site.navLinks.${index}.href`, {
+              onBlur: (event) => {
+                const next = canonicalizeNavHref(event.target.value);
+                if (next !== event.target.value) {
+                  setValue(`site.navLinks.${index}.href`, next, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                }
+              },
+            })}
+            aria-label={m.settings_site_nav_url()}
+            placeholder={m.settings_site_nav_href_ph()}
+            className={cn(isExternalNavHref(canonicalHref) && "pr-10")}
+          />
+          {isExternalNavHref(canonicalHref) ? (
+            <ExternalLink
+              size={14}
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 fuwari-text-30"
+            />
+          ) : null}
+        </div>
+        <IconButton
+          size="md"
+          onClick={() => setOpen((value) => !value)}
+          className="site-nav-child-toggle"
+          aria-expanded={open}
+          label={m.settings_site_nav_child_add()}
+          data-has-children={childCount > 0}
+        >
+          <ListTree size={16} />
+        </IconButton>
+        <IconButton
+          size="md"
+          tone="danger"
+          onClick={onRemove}
+          label={m.settings_site_nav_remove()}
+        >
+          <Trash2 size={16} />
+        </IconButton>
+      </div>
+      {labelError || hrefError ? (
+        <p className="fuwari-form-field-error">{hrefError || labelError}</p>
+      ) : null}
+      {open ? <NavChildrenEditor parentIndex={index} /> : null}
+    </div>
+  );
+}
+
 function NavChildrenEditor({ parentIndex }: { parentIndex: number }) {
   const { control, register, setValue, watch, formState } =
     useFormContext<SystemConfig>();
@@ -356,22 +390,11 @@ function NavChildrenEditor({ parentIndex }: { parentIndex: number }) {
   const parentErrors = formState.errors.site?.navLinks?.[parentIndex]
     ?.children as Array<{ label?: { message?: string }; href?: { message?: string } }> | undefined;
 
-  if (fields.length === 0) {
-    return (
-      <Button
-        variant="text"
-        size="sm"
-        onClick={() => append({ label: "", href: "" })}
-        icon={<Plus size={12} />}
-        className="site-nav-child-add"
-      >
-        {m.settings_site_nav_child_add()}
-      </Button>
-    );
-  }
-
   return (
     <div className="site-nav-children">
+      <p className="site-nav-children-hint">
+        {m.settings_site_nav_child_hint()}
+      </p>
       {fields.map((field, childIndex) => {
         const childHref =
           watch(`site.navLinks.${parentIndex}.children.${childIndex}.href`) ??
@@ -382,13 +405,10 @@ function NavChildrenEditor({ parentIndex }: { parentIndex: number }) {
         return (
           <div key={field.id} className="site-nav-child">
             <div className="site-nav-row site-nav-child-row">
-              <span className="site-nav-child-indent" aria-hidden="true">
-                <CornerDownRight size={14} />
-              </span>
               <Input
                 {...register(`${name}.${childIndex}.label` as never)}
-                placeholder={m.settings_site_nav_child_label_ph()}
-                aria-label={m.settings_site_nav_child_name()}
+                placeholder={m.settings_site_nav_label_ph()}
+                aria-label={m.settings_site_nav_name()}
               />
               <div className="relative min-w-0 flex-1">
                 <Input
@@ -407,8 +427,8 @@ function NavChildrenEditor({ parentIndex }: { parentIndex: number }) {
                       }
                     },
                   })}
-                  aria-label={m.settings_site_nav_child_url()}
-                  placeholder={m.settings_site_nav_child_href_ph()}
+                  aria-label={m.settings_site_nav_url()}
+                  placeholder={m.settings_site_nav_href_ph()}
                   className={cn(
                     isExternalNavHref(canonicalChildHref) && "pr-10",
                   )}
@@ -430,7 +450,9 @@ function NavChildrenEditor({ parentIndex }: { parentIndex: number }) {
               </IconButton>
             </div>
             {labelError || hrefError ? (
-              <p className="fuwari-form-field-error">{hrefError || labelError}</p>
+              <p className="fuwari-form-field-error">
+                {hrefError || labelError}
+              </p>
             ) : null}
           </div>
         );
@@ -441,16 +463,14 @@ function NavChildrenEditor({ parentIndex }: { parentIndex: number }) {
           size="sm"
           onClick={() => append({ label: "", href: "" })}
           icon={<Plus size={12} />}
-          className="site-nav-child-add"
+          className="site-add-child"
         >
           {m.settings_site_nav_child_add()}
         </Button>
       ) : null}
     </div>
   );
-}
-
-function SocialPills() {
+}function SocialPills() {
   const { control, register, watch, setValue } = useFormContext<SystemConfig>();
   const { fields, append, remove } = useFieldArray({
     control,

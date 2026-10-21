@@ -361,15 +361,20 @@
   padding-left: 12px;
   border-left: 2px solid var(--admin-rule);
 }
-.site-nav-child-row {
-  grid-template-columns: 20px minmax(0, 1fr) minmax(0, 1.3fr) 36px;
-}
-.site-nav-child-indent {
-  display: grid;
-  place-items: center;
+.site-nav-children-hint {
+  font-size: 12px;
   color: var(--fuwari-fg-50);
 }
-.site-nav-child-add {
+.site-nav-child-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) 36px;
+}
+.site-nav-child-toggle {
+  color: var(--fuwari-fg-50);
+}
+.site-nav-child-toggle[data-has-children="true"] {
+  color: var(--fuwari-primary);
+}
+.site-add-child {
   margin-top: 2px;
   justify-self: start;
 }
