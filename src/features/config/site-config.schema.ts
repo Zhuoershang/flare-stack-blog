@@ -3,6 +3,7 @@ import type { Messages } from "@/lib/i18n";
 import {
   canonicalizeNavHref,
   isNavHref,
+  NAV_LINK_CHILDREN_MAX,
   NAV_LINK_LABEL_MAX,
   NAV_LINKS_MAX,
 } from "./utils/nav-links";
@@ -22,11 +23,31 @@ function createSiteTextSchema(max: number) {
   return z.string().trim().max(max);
 }
 
-const NavLinkSchema = z.object({
+const NavLinkSchema: z.ZodType<{
+  label: string;
+  href: string;
+  children?: Array<{
+    label: string;
+    href: string;
+  }>;
+}> = z.object({
   label: createSiteTextSchema(NAV_LINK_LABEL_MAX).pipe(z.string().min(1)),
   href: z.string().trim().refine(isNavHref, {
     message: "Please enter a root-relative path or http(s) URL",
   }),
+  children: z
+    .array(
+      z.object({
+        label: createSiteTextSchema(NAV_LINK_LABEL_MAX).pipe(
+          z.string().min(1),
+        ),
+        href: z.string().trim().refine(isNavHref, {
+          message: "Please enter a root-relative path or http(s) URL",
+        }),
+      }),
+    )
+    .max(NAV_LINK_CHILDREN_MAX)
+    .optional(),
 });
 
 function createNavLinksFormSchema(messages: Messages) {
@@ -35,6 +56,15 @@ function createNavLinksFormSchema(messages: Messages) {
       z.object({
         label: z.string(),
         href: z.string(),
+        children: z
+          .array(
+            z.object({
+              label: z.string(),
+              href: z.string(),
+            }),
+          )
+          .max(NAV_LINK_CHILDREN_MAX)
+          .optional(),
       }),
     )
     .max(NAV_LINKS_MAX)
@@ -42,11 +72,20 @@ function createNavLinksFormSchema(messages: Messages) {
       links.map((link) => ({
         label: link.label.trim(),
         href: canonicalizeNavHref(link.href),
+        ...(link.children && link.children.length > 0
+          ? {
+              children: link.children.map((child) => ({
+                label: child.label.trim(),
+                href: canonicalizeNavHref(child.href),
+              })),
+            }
+          : {}),
       })),
     )
     .superRefine((links, ctx) => {
       links.forEach((link, index) => {
-        if (!link.label && !link.href) return;
+        const hasChildren = Boolean(link.children && link.children.length > 0);
+        if (!link.label && !link.href && !hasChildren) return;
         if (!link.label) {
           ctx.addIssue({
             code: "custom",
@@ -75,6 +114,38 @@ function createNavLinksFormSchema(messages: Messages) {
             path: [index, "href"],
           });
         }
+        link.children?.forEach((child, childIndex) => {
+          const path = [index, "children", childIndex] as const;
+          if (!child.label && !child.href) return;
+          if (!child.label) {
+            ctx.addIssue({
+              code: "custom",
+              message: messages.settings_site_validation_nav_label_required(),
+              path: [...path, "label"],
+            });
+          } else if (child.label.length > NAV_LINK_LABEL_MAX) {
+            ctx.addIssue({
+              code: "custom",
+              message: messages.settings_site_validation_too_long({
+                max: NAV_LINK_LABEL_MAX,
+              }),
+              path: [...path, "label"],
+            });
+          }
+          if (!child.href) {
+            ctx.addIssue({
+              code: "custom",
+              message: messages.settings_site_validation_nav_href_required(),
+              path: [...path, "href"],
+            });
+          } else if (!isNavHref(child.href)) {
+            ctx.addIssue({
+              code: "custom",
+              message: messages.settings_site_validation_invalid_nav_href(),
+              path: [...path, "href"],
+            });
+          }
+        });
       });
     });
 }

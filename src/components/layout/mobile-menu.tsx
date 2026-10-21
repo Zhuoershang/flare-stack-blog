@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { LogOut, Settings, User as UserIcon } from "lucide-react";
+import { ChevronDown, LogOut, Settings, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/components/common/theme-provider";
 import { ThemeToggle } from "@/components/common/theme-toggle";
@@ -9,6 +9,42 @@ import { PublicNavLink } from "./public-nav-link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { m } from "@/paraglide/messages";
 import { getLocale, setLocale } from "@/paraglide/runtime";
+
+function NavAccordionGroup({
+  option,
+  onClose,
+}: {
+  option: NavOption;
+  onClose: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="public-menu-group" data-open={open}>
+      <button
+        type="button"
+        className="public-menu-item public-menu-group-trigger"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span className="truncate">{option.label}</span>
+        <ChevronDown size={16} className="public-menu-group-chevron" />
+      </button>
+      {open && (
+        <div className="public-menu-group-items">
+          {option.children?.map((child) => (
+            <PublicNavLink
+              key={child.id}
+              option={child}
+              onClick={onClose}
+              className="public-menu-item public-menu-subitem"
+              activeClassName="public-menu-active"
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface MobileMenuProps {
   navOptions: Array<NavOption>;
@@ -41,15 +77,23 @@ export function MobileMenu({
       {mobile && (
         <>
           <nav className="public-menu-links">
-            {navOptions.map((option) => (
-              <PublicNavLink
-                key={option.id}
-                option={option}
-                onClick={onClose}
-                className="public-menu-item"
-                activeClassName="public-menu-active"
-              />
-            ))}
+            {navOptions.map((option) =>
+              option.children && option.children.length > 0 ? (
+                <NavAccordionGroup
+                  key={option.id}
+                  option={option}
+                  onClose={onClose}
+                />
+              ) : (
+                <PublicNavLink
+                  key={option.id}
+                  option={option}
+                  onClick={onClose}
+                  className="public-menu-item"
+                  activeClassName="public-menu-active"
+                />
+              ),
+            )}
           </nav>
           <div className="public-menu-preferences">
             <ThemeToggle className="public-menu-theme" label={themeLabel} />

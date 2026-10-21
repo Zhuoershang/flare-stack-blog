@@ -1,9 +1,12 @@
-export const NAV_LINKS_MAX = 5;
+export const NAV_LINKS_MAX = 8;
+export const NAV_LINK_CHILDREN_MAX = 8;
+export const NAV_LINK_DEPTH_MAX = 2;
 export const NAV_LINK_LABEL_MAX = 20;
 
 export type NavLink = {
   label: string;
   href: string;
+  children?: NavLink[];
 };
 
 export function isExternalNavHref(href: string): boolean {
@@ -41,23 +44,47 @@ export function canonicalizeNavHref(href: string): string {
   return trimmed;
 }
 
+type NavLinkRecord = {
+  label?: unknown;
+  href?: unknown;
+  children?: unknown;
+};
+
+function normalizeNavLink(
+  item: NavLinkRecord | undefined,
+  depth: number,
+): NavLink | null {
+  if (!item || typeof item !== "object") return null;
+  if (depth >= NAV_LINK_DEPTH_MAX) return null;
+  const label = typeof item.label === "string" ? item.label.trim() : "";
+  const href = canonicalizeNavHref(
+    typeof item.href === "string" ? item.href : "",
+  );
+  if (!label || !isNavHref(href)) return null;
+  const link: NavLink = {
+    label: label.slice(0, NAV_LINK_LABEL_MAX),
+    href,
+  };
+  const children: NavLink[] = [];
+  if (Array.isArray(item.children)) {
+    for (const child of item.children) {
+      if (children.length >= NAV_LINK_CHILDREN_MAX) break;
+      const normalized = normalizeNavLink(child as NavLinkRecord, depth + 1);
+      if (normalized) children.push(normalized);
+    }
+  }
+  if (children.length > 0) link.children = children;
+  return link;
+}
+
 export function normalizeNavLinks(value: unknown): NavLink[] {
   if (!Array.isArray(value)) return [];
 
   const links: NavLink[] = [];
   for (const item of value) {
-    if (!item || typeof item !== "object") continue;
-    const record = item as { label?: unknown; href?: unknown };
-    const label = typeof record.label === "string" ? record.label.trim() : "";
-    const href = canonicalizeNavHref(
-      typeof record.href === "string" ? record.href : "",
-    );
-    if (!label || !isNavHref(href)) continue;
-    links.push({
-      label: label.slice(0, NAV_LINK_LABEL_MAX),
-      href,
-    });
     if (links.length >= NAV_LINKS_MAX) break;
+    const link = normalizeNavLink(item as NavLinkRecord, 0);
+    if (link) links.push(link);
   }
   return links;
 }

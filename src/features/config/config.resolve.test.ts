@@ -100,6 +100,8 @@ describe("resolveSiteConfig navLinks", () => {
           { label: "Extra", href: "/too-many-2" },
           { label: "Extra", href: "/too-many-3" },
           { label: "Extra", href: "/too-many-4" },
+          { label: "Extra", href: "/too-many-5" },
+          { label: "Extra", href: "/too-many-6" },
         ],
       },
     });
@@ -110,6 +112,9 @@ describe("resolveSiteConfig navLinks", () => {
       { label: "Extra", href: "/too-many-1" },
       { label: "Extra", href: "/too-many-2" },
       { label: "Extra", href: "/too-many-3" },
+      { label: "Extra", href: "/too-many-4" },
+      { label: "Extra", href: "/too-many-5" },
+      { label: "Extra", href: "/too-many-6" },
     ]);
   });
 });

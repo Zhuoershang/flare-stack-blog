@@ -56,6 +56,12 @@ function PublicLayout() {
       label: link.label,
       href: link.href,
       external: isExternalNavHref(link.href),
+      children: link.children?.map((child, childIndex) => ({
+        id: `custom-${index}-${childIndex}`,
+        label: child.label,
+        href: child.href,
+        external: isExternalNavHref(child.href),
+      })),
     })),
   ];
 

@@ -2,6 +2,7 @@ import { useNavSort } from "./use-nav-sort";
 import { SettingsDisclosure } from "./settings-disclosure";
 import "./site-studio.css";
 import {
+  CornerDownRight,
   ExternalLink,
   GripVertical,
   Pencil,
@@ -25,6 +26,7 @@ import {
 import {
   canonicalizeNavHref,
   isExternalNavHref,
+  NAV_LINK_CHILDREN_MAX,
   NAV_LINKS_MAX,
 } from "@/features/config/utils/nav-links";
 import {
@@ -325,6 +327,7 @@ function NavLinksEditor() {
                   {hrefError || labelError}
                 </p>
               ) : null}
+              <NavChildrenEditor parentIndex={index} />
             </div>
           );
         })}
@@ -342,6 +345,108 @@ function NavLinksEditor() {
         </Button>
       ) : null}
     </section>
+  );
+}
+
+function NavChildrenEditor({ parentIndex }: { parentIndex: number }) {
+  const { control, register, setValue, watch, formState } =
+    useFormContext<SystemConfig>();
+  const name = `site.navLinks.${parentIndex}.children` as const;
+  const { fields, append, remove } = useFieldArray({ control, name });
+  const parentErrors = formState.errors.site?.navLinks?.[parentIndex]
+    ?.children as Array<{ label?: { message?: string }; href?: { message?: string } }> | undefined;
+
+  if (fields.length === 0) {
+    return (
+      <Button
+        variant="text"
+        size="sm"
+        onClick={() => append({ label: "", href: "" })}
+        icon={<Plus size={12} />}
+        className="site-nav-child-add"
+      >
+        {m.settings_site_nav_child_add()}
+      </Button>
+    );
+  }
+
+  return (
+    <div className="site-nav-children">
+      {fields.map((field, childIndex) => {
+        const childHref =
+          watch(`site.navLinks.${parentIndex}.children.${childIndex}.href`) ??
+          "";
+        const canonicalChildHref = canonicalizeNavHref(childHref);
+        const labelError = parentErrors?.[childIndex]?.label?.message;
+        const hrefError = parentErrors?.[childIndex]?.href?.message;
+        return (
+          <div key={field.id} className="site-nav-child">
+            <div className="site-nav-row site-nav-child-row">
+              <span className="site-nav-child-indent" aria-hidden="true">
+                <CornerDownRight size={14} />
+              </span>
+              <Input
+                {...register(`${name}.${childIndex}.label` as never)}
+                placeholder={m.settings_site_nav_child_label_ph()}
+                aria-label={m.settings_site_nav_child_name()}
+              />
+              <div className="relative min-w-0 flex-1">
+                <Input
+                  {...register(`${name}.${childIndex}.href` as never, {
+                    onBlur: (event) => {
+                      const next = canonicalizeNavHref(event.target.value);
+                      if (next !== event.target.value) {
+                        setValue(
+                          `site.navLinks.${parentIndex}.children.${childIndex}.href` as `site.navLinks.${number}.children.${number}.href`,
+                          next,
+                          {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          },
+                        );
+                      }
+                    },
+                  })}
+                  aria-label={m.settings_site_nav_child_url()}
+                  placeholder={m.settings_site_nav_child_href_ph()}
+                  className={cn(
+                    isExternalNavHref(canonicalChildHref) && "pr-10",
+                  )}
+                />
+                {isExternalNavHref(canonicalChildHref) ? (
+                  <ExternalLink
+                    size={14}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 fuwari-text-30"
+                  />
+                ) : null}
+              </div>
+              <IconButton
+                size="md"
+                tone="danger"
+                onClick={() => remove(childIndex)}
+                label={m.settings_site_nav_remove()}
+              >
+                <Trash2 size={16} />
+              </IconButton>
+            </div>
+            {labelError || hrefError ? (
+              <p className="fuwari-form-field-error">{hrefError || labelError}</p>
+            ) : null}
+          </div>
+        );
+      })}
+      {fields.length < NAV_LINK_CHILDREN_MAX ? (
+        <Button
+          variant="text"
+          size="sm"
+          onClick={() => append({ label: "", href: "" })}
+          icon={<Plus size={12} />}
+          className="site-nav-child-add"
+        >
+          {m.settings_site_nav_child_add()}
+        </Button>
+      ) : null}
+    </div>
   );
 }
 

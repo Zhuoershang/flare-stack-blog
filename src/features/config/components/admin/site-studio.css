@@ -354,6 +354,25 @@
   opacity: 0.3;
   cursor: default;
 }
+.site-nav-children {
+  display: grid;
+  gap: 8px;
+  margin: 2px 0 6px 24px;
+  padding-left: 12px;
+  border-left: 2px solid var(--admin-rule);
+}
+.site-nav-child-row {
+  grid-template-columns: 20px minmax(0, 1fr) minmax(0, 1.3fr) 36px;
+}
+.site-nav-child-indent {
+  display: grid;
+  place-items: center;
+  color: var(--fuwari-fg-50);
+}
+.site-nav-child-add {
+  margin-top: 2px;
+  justify-self: start;
+}
 
 /* Inline editing highlights the entire label, never a second box inside it. */
 .settings-workspace .site-studio .site-inline-input,
