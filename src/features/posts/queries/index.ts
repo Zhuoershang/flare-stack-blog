@@ -65,3 +65,7 @@ export function postRevisionDetailQuery(postId: number, revisionId: number) {
 export function popularPostsQuery(limit?: number) {
   return orpc.posts.popular.queryOptions({ input: { limit } });
 }
+
+export function relatedPostsQuery(slug: string, limit = 5) {
+  return orpc.posts.related.queryOptions({ input: { slug, limit } });
+}

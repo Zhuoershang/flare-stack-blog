@@ -10,6 +10,7 @@ import {
   PUBLIC_IMAGE_WIDTH,
 } from "@/features/media/utils/media.utils";
 import { cn } from "@/lib/utils";
+import { BannerCarousel } from "./banner-carousel";
 import { BackToTop } from "./back-to-top";
 import { FloatingActionsProvider } from "./floating-actions";
 import { Footer } from "./footer";
@@ -92,14 +93,13 @@ export function PublicLayout({
           className="absolute left-0 right-0 top-0 z-10 overflow-hidden transition-[height] duration-700"
           style={{ height: `${bannerHeightVh}vh` }}
         >
-          <img
-            src={getPublicImageSrc(
-              siteConfig.theme.fuwari.homeBg,
-              PUBLIC_IMAGE_WIDTH.banner,
-            )}
-            alt="banner"
-            fetchPriority={isHomePage ? "high" : "auto"}
-            className="fuwari-banner-image w-full h-full object-cover object-center"
+          <BannerCarousel
+            images={
+              siteConfig.theme.fuwari.bannerImages?.length
+                ? siteConfig.theme.fuwari.bannerImages
+                : [siteConfig.theme.fuwari.homeBg]
+            }
+            highPriority={isHomePage}
           />
           {/* Mizuki parallax waves: fill follows the page background so the
               banner melts into the content area. */}

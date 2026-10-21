@@ -34,6 +34,7 @@ import * as PostService from "@/features/posts/services/posts.service";
 import * as VideoMetaService from "@/features/posts/services/video-meta.service";
 import { videoSourceOf } from "@/features/posts/utils/video-source";
 import { postPopularityService } from "@/features/post-popularity/service/post-popularity.service";
+import * as RelatedPostsService from "@/features/posts/service/related-posts.service";
 import { getPostPublisher } from "@/lib/do/post-publisher-binding";
 import { adminProcedure, publicProcedure } from "@/lib/orpc/procedure";
 import { unwrapResult } from "@/lib/orpc/unwrap-result";
@@ -147,6 +148,32 @@ const popular = publicProcedure
   .output(z.array(PostItemSchema))
   .handler(({ context, input }) =>
     postPopularityService.getPopular(context, input.limit),
+  );
+
+const related = publicProcedure
+  .route({
+    method: "GET",
+    path: "/posts/related/{slug}",
+    summary: "List related published posts for a slug",
+    tags: ["Posts"],
+  })
+  .input(
+    z.object({
+      slug: z.string().min(1),
+      limit: z.number().int().min(1).max(5).optional(),
+    }),
+  )
+  .output(
+    z.array(
+      z.object({
+        slug: z.string(),
+        title: z.string(),
+        cover: z.string().nullable(),
+      }),
+    ),
+  )
+  .handler(({ context, input }) =>
+    RelatedPostsService.getRelated(context, input.slug, input.limit ?? 5),
   );
 
 const adminList = adminProcedure
@@ -376,6 +403,7 @@ export default {
   adjacent,
   pinned,
   popular,
+  related,
   admin: {
     list: adminList,
     get: adminGet,

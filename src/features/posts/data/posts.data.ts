@@ -411,6 +411,30 @@ export async function findPinnedPosts(db: DB) {
   return hydratePublicPosts(db, rows);
 }
 
+/** Lightweight recent-published scan for related-post scoring. */
+export async function findRecentPublished(db: DB, limit: number) {
+  const rows = await db
+    .select({
+      id: PostsTable.id,
+      publicSnapshotJson: PostsTable.publicSnapshotJson,
+    })
+    .from(PostsTable)
+    .where(
+      and(
+        eq(PostsTable.status, "published"),
+        isNotNull(PostsTable.publicSnapshotJson),
+        isNotNull(PostsTable.publicSlug),
+      ),
+    )
+    .orderBy(desc(snapshotPublishedAt))
+    .limit(limit);
+
+  return rows.flatMap((row) => {
+    if (!row.publicSnapshotJson || !row.publicSnapshotJson.slug) return [];
+    return [{ id: row.id, snapshot: row.publicSnapshotJson }];
+  });
+}
+
 export async function findPostsByIds(db: DB, ids: number[]) {
   if (ids.length === 0) return [];
 

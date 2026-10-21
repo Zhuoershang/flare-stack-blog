@@ -92,6 +92,21 @@
     transform 400ms var(--mizuki-reveal-ease);
 }
 
+/* --- Mizuki banner Ken Burns (B7) --- */
+@keyframes fuwari-ken-burns {
+  0% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1.13);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fuwari-banner-frame {
+    animation: none !important;
+  }
+}
+
 /* --- Mizuki banner parallax waves (A7) --- */
 .fuwari-wave-parallax use {
   animation: fuwari-wave 25s cubic-bezier(0.5, 0.5, 0.45, 0.5) infinite;

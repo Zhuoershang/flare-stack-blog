@@ -11,6 +11,7 @@ import { usePhotoSwipeGallery } from "./content/photo-swipe";
 import { useHeadingAnchors } from "./content/use-heading-anchors";
 import ZoomableImage from "./content/zoomable-image";
 import { PostAdjacentNav } from "./post-adjacent-nav";
+import { RelatedPosts } from "./related-posts";
 import { PostMeta } from "./post-meta";
 import { PostOutdatedNotice } from "./post-outdated-notice";
 import { PostSummary } from "./post-summary";
@@ -159,6 +160,8 @@ export function PostPage({ post }: PostPageProps) {
           </div>
         </div>
       </div>
+
+      <RelatedPosts slug={post.slug} />
 
       <PostAdjacentNav slug={post.slug} />
 

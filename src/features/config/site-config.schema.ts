@@ -247,6 +247,10 @@ function createFuwariThemeSiteConfigSchema() {
     avatar: createAssetRefSchema(),
     primaryHue: createHueSchema(),
     wallpaper: createBackgroundImageRefSchema().optional(),
+    bannerImages: z
+      .array(createBackgroundImageRefSchema())
+      .max(5)
+      .optional(),
   });
 }
 
@@ -256,6 +260,10 @@ function createFuwariThemeSiteConfigInputSchema() {
     avatar: createAssetRefSchema().optional(),
     primaryHue: createHueSchema().optional(),
     wallpaper: createBackgroundImageRefSchema().optional(),
+    bannerImages: z
+      .array(createBackgroundImageRefSchema())
+      .max(5)
+      .optional(),
   });
 }
 
@@ -265,6 +273,10 @@ function createFuwariThemeSiteConfigInputFormSchema(messages: Messages) {
     avatar: createAssetRefFormSchema(messages).optional(),
     primaryHue: createHueFormSchema(messages).optional(),
     wallpaper: createBackgroundImageRefFormSchema(messages).optional(),
+    bannerImages: z
+      .array(createBackgroundImageRefFormSchema(messages))
+      .max(5)
+      .optional(),
   });
 }
 
