@@ -250,14 +250,17 @@ export default function TableOfContents({
               }}
               className={cn(
                 "px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl py-2 z-10",
-                "hover:bg-(--fuwari-toc-btn-hover) active:bg-(--fuwari-toc-btn-active)",
+                "hover:bg-(--fuwari-toc-btn-hover) hover:translate-x-px active:bg-(--fuwari-toc-btn-active)",
               )}
             >
               <TocBadge heading={heading} />
               <div
                 className={cn(
                   "transition text-sm",
-                  heading.relative === 2 ? "fuwari-text-30" : "fuwari-text-50",
+                  heading.relative === 2
+                    ? "text-(--fuwari-fg-30)"
+                    : "text-(--fuwari-fg-50)",
+                  heading.relative === 2 ? "pl-[0.4rem]" : "pl-0",
                 )}
               >
                 {heading.text}
@@ -265,7 +268,7 @@ export default function TableOfContents({
             </a>
           ))}
           <div
-            className="-z-10 absolute left-0 right-0 rounded-xl transition-all bg-(--fuwari-toc-btn-hover) border-2 border-dashed border-(--fuwari-toc-btn-hover) group-hover:bg-transparent group-hover:border-(--fuwari-toc-btn-active) pointer-events-none"
+            className="-z-10 absolute left-0 right-0 rounded-xl transition-all duration-200 bg-(--fuwari-toc-btn-hover) border-2 border-dashed border-(--fuwari-toc-btn-hover) group-hover:bg-transparent group-hover:border-(--fuwari-toc-btn-active) pointer-events-none"
             style={{
               top: indicator.top,
               height: indicator.height,

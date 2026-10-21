@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./styles/motion.css";
+@import "./styles/mizuki-reveal.css";
 @import "tw-animate-css";
 @import "@fontsource/roboto/400.css";
 @import "@fontsource/roboto/500.css";
@@ -72,6 +73,7 @@
     --fuwari-primary-active: oklch(0.6 0.14 var(--fuwari-hue));
     --fuwari-page-bg: oklch(0.95 0.01 var(--fuwari-hue));
     --fuwari-card-bg: white;
+    --fuwari-card-transparent-opacity: 0.8;
     --fuwari-btn-content: oklch(0.55 0.12 var(--fuwari-hue));
     --fuwari-btn-regular-bg: oklch(0.95 0.025 var(--fuwari-hue));
     --fuwari-btn-regular-bg-hover: oklch(0.9 0.05 var(--fuwari-hue));
@@ -170,6 +172,81 @@
     transition:
       background-color 0.3s,
       color 0.3s;
+  }
+
+  /* --- Mizuki-style transparent card variants (wallpaper mode) --- */
+  :root {
+    --fuwari-card-bg-transparent: var(--fuwari-card-bg);
+  }
+  body.fuwari-wallpaper {
+    --fuwari-card-bg-transparent: rgb(
+      255 255 255 / var(--fuwari-card-transparent-opacity, 0.8)
+    );
+  }
+  body.fuwari-wallpaper.dark {
+    --fuwari-card-bg-transparent: rgb(
+      23 23 23 / var(--fuwari-card-transparent-opacity, 0.8)
+    );
+  }
+  .fuwari-card-glass {
+    background-color: var(--fuwari-card-bg-transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    isolation: isolate;
+  }
+  body.fuwari-wallpaper .fuwari-card-base {
+    background-color: var(--fuwari-card-bg-transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    isolation: isolate;
+  }
+  body.fuwari-wallpaper .fuwari-float-panel,
+  body.fuwari-wallpaper .fuwari-navbar-glass {
+    background-color: var(--fuwari-card-bg-transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* --- Mizuki gradient buttons (oklch relative color) --- */
+  .fuwari-btn-gradient {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(
+      135deg,
+      oklch(from var(--fuwari-primary) l c h) 0%,
+      oklch(from var(--fuwari-primary) calc(l + 0.1) c calc(h + 30)) 100%
+    );
+    box-shadow: 0 2px 4px oklch(from var(--fuwari-primary) l c h / 0.3);
+    transition: all 0.3s ease;
+  }
+  .fuwari-btn-gradient:hover {
+    background: linear-gradient(
+      135deg,
+      oklch(from var(--fuwari-primary) calc(l + 0.05) c h) 0%,
+      oklch(from var(--fuwari-primary) calc(l + 0.15) c calc(h + 30)) 100%
+    );
+    box-shadow: 0 4px 8px oklch(from var(--fuwari-primary) l c h / 0.4);
+    transform: translateY(-2px);
+  }
+  .fuwari-btn-gradient:active {
+    transform: translateY(0);
+  }
+  .dark .fuwari-btn-gradient {
+    background: linear-gradient(
+      135deg,
+      oklch(from var(--fuwari-primary) calc(l - 0.1) c h) 0%,
+      oklch(from var(--fuwari-primary) l c calc(h + 30)) 100%
+    );
   }
 
   .fuwari-btn-regular {
@@ -532,6 +609,29 @@
   --tw-prose-th-borders: var(--fuwari-meta-divider);
   --tw-prose-td-borders: var(--fuwari-meta-divider);
   color: var(--tw-prose-body);
+
+  /* --- Mizuki reading rail: narrow prose children, wide breakout blocks ---
+   * Direct children of the markdown container are capped to the reading
+   * width and left-aligned; tables/code/KaTeX/mermaid/image grids break out
+   * to the full card width. Only direct children are affected, so nested
+   * lists and quotes keep their indentation. */
+  > * {
+    max-width: min(100%, 48rem);
+    margin-inline-start: 0;
+    margin-inline-end: auto;
+  }
+  > :is(
+      .fuwari-table-scroll,
+      [data-rehype-pretty-code-wrapper],
+      pre,
+      .katex-display,
+      .mermaid,
+      .image-grid,
+      p:has(> .katex-display)
+    ) {
+    max-width: none;
+    margin-inline: 0;
+  }
 
   h1 {
     @apply text-3xl font-bold font-sans tracking-normal mt-10 mb-6;

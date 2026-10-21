@@ -1,0 +1,141 @@
+/* Scroll-reveal & entrance animations ported from Mizuki
+ * (https://github.com/LyraVoid/Mizuki, Apache-2.0).
+ * All effects honor prefers-reduced-motion. */
+
+:root {
+  --mizuki-reveal-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Initial states: elements start offset/scaled; `.animate` restores them. */
+.mizuki-enhanced-fade-in {
+  opacity: 0;
+  transform: translateY(1.5rem) scale(0.98);
+}
+.mizuki-enhanced-fade-in.animate {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 350ms var(--mizuki-reveal-ease),
+    transform 350ms var(--mizuki-reveal-ease);
+}
+
+.mizuki-card-animate {
+  opacity: 0;
+  transform: translateY(2rem) scale(0.95);
+}
+.mizuki-card-animate.animate {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 400ms var(--mizuki-reveal-ease),
+    transform 400ms var(--mizuki-reveal-ease);
+}
+
+.mizuki-sidebar-animate {
+  opacity: 0;
+  transform: translateX(-2rem);
+}
+.mizuki-sidebar-animate.animate {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 300ms var(--mizuki-reveal-ease),
+    transform 300ms var(--mizuki-reveal-ease);
+}
+
+.mizuki-post-content-animate {
+  opacity: 0;
+  transform: translateY(1rem);
+}
+.mizuki-post-content-animate.animate {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 320ms var(--mizuki-reveal-ease),
+    transform 320ms var(--mizuki-reveal-ease);
+}
+
+.mizuki-footer-animate {
+  opacity: 0;
+  transform: translateY(1rem);
+}
+.mizuki-footer-animate.animate {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 300ms var(--mizuki-reveal-ease),
+    transform 300ms var(--mizuki-reveal-ease);
+}
+
+.mizuki-tag-animate {
+  opacity: 0;
+  transform: translateY(0.5rem) scale(0.9);
+}
+.mizuki-tag-animate.animate {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 200ms var(--mizuki-reveal-ease),
+    transform 200ms var(--mizuki-reveal-ease);
+}
+
+/* Scroll-triggered variant: JS adds `.in-view` once, then unobserves. */
+.mizuki-on-scroll {
+  opacity: 0;
+  transform: translateY(2rem) scale(0.97);
+}
+.mizuki-on-scroll.in-view {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 400ms var(--mizuki-reveal-ease),
+    transform 400ms var(--mizuki-reveal-ease);
+}
+
+/* Hover enhancements */
+.mizuki-button-enhance {
+  transition:
+    transform 200ms var(--mizuki-reveal-ease),
+    box-shadow 200ms var(--mizuki-reveal-ease);
+}
+.mizuki-button-enhance:hover {
+  transform: translateY(-2px);
+}
+
+.mizuki-link-enhance {
+  position: relative;
+}
+.mizuki-link-enhance::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: var(--fuwari-primary);
+  transition: width 200ms var(--mizuki-reveal-ease);
+}
+.mizuki-link-enhance:hover::after {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mizuki-enhanced-fade-in,
+  .mizuki-card-animate,
+  .mizuki-sidebar-animate,
+  .mizuki-post-content-animate,
+  .mizuki-footer-animate,
+  .mizuki-tag-animate,
+  .mizuki-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .mizuki-button-enhance,
+  .mizuki-link-enhance {
+    transition: none;
+  }
+  .mizuki-button-enhance:hover {
+    transform: none;
+  }
+}
