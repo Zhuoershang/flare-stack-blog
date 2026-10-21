@@ -10,13 +10,23 @@ import {
 export function BackToTop() {
   const setSlot = useFloatingActionsSlotRef();
   const [isVisible, setIsVisible] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    let tick = false;
     const handleScroll = () => {
       // Same logic as original Fuwari: show after banner height
       // The current Fuwari banner logic sets banner to ~35vh or 65vh, let's use 35vh as base threshold
       const bannerHeight = window.innerHeight * 0.35;
       setIsVisible(window.scrollY > bannerHeight);
+      if (tick) return;
+      tick = true;
+      requestAnimationFrame(() => {
+        tick = false;
+        const doc = document.documentElement;
+        const max = doc.scrollHeight - window.innerHeight;
+        setProgress(max > 0 ? Math.min(1, window.scrollY / max) : 0);
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -42,7 +52,8 @@ export function BackToTop() {
       <button
         onClick={scrollToTop}
         aria-label={m.post_back_to_top()}
-        className={FLOATING_ACTION_BUTTON_CLASS}
+        className={cn(FLOATING_ACTION_BUTTON_CLASS, "fuwari-progress-ring")}
+        style={{ "--progress": progress } as React.CSSProperties}
       >
         <ArrowUp className="w-6 h-6 lg:w-7 lg:h-7" strokeWidth={2.5} />
       </button>

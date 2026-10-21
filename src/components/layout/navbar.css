@@ -14,7 +14,14 @@
   opacity: 1;
   pointer-events: auto;
 }
+/* --- B1: token-driven navbar glass (ported from Mizuki) ---
+ * All chrome appearance flows from four tokens; the semi (frosted glass)
+ * default activates a translucent card color + backdrop blur. */
 .public-navbar {
+  --nav-bg: var(--fuwari-card-bg);
+  --nav-blur: none;
+  --nav-shadow: none;
+
   display: flex;
   align-items: center;
   gap: 20px;
@@ -23,6 +30,21 @@
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   overflow: visible !important;
+  background: var(--nav-bg);
+  backdrop-filter: var(--nav-blur);
+  -webkit-backdrop-filter: var(--nav-blur);
+  box-shadow: var(--nav-shadow);
+  transition:
+    background 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.public-navbar-wrapper[data-scrolled="true"] .public-navbar {
+  --nav-bg: var(--fuwari-card-bg-transparent);
+  --nav-blur: blur(8px);
+  --nav-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
+}
+.dark .public-navbar-wrapper[data-scrolled="true"] .public-navbar {
+  --nav-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
 }
 .public-brand {
   display: flex;

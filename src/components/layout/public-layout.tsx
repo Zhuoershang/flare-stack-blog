@@ -78,6 +78,54 @@ export function PublicLayout({
             fetchPriority={isHomePage ? "high" : "auto"}
             className="fuwari-banner-image w-full h-full object-cover object-center"
           />
+          {/* Mizuki parallax waves: fill follows the page background so the
+              banner melts into the content area. */}
+          <div className="fuwari-banner-waves absolute bottom-0 left-0 w-full h-[10vh] max-h-37.5 min-h-12.5 md:h-[15vh]">
+            <svg
+              className="w-full h-full"
+              viewBox="0 20 150 32"
+              preserveAspectRatio="none"
+              shapeRendering="auto"
+              aria-hidden="true"
+            >
+              <defs>
+                <path
+                  id="fuwari-gentle-wave"
+                  d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v48h-352z"
+                />
+              </defs>
+              <g className="fuwari-wave-parallax">
+                <use
+                  href="#fuwari-gentle-wave"
+                  x="48"
+                  y="0"
+                  className="opacity-25 fill-(--fuwari-page-bg)"
+                  style={{ animationDelay: "-2s", animationDuration: "7s" }}
+                />
+                <use
+                  href="#fuwari-gentle-wave"
+                  x="48"
+                  y="3"
+                  className="opacity-50 fill-(--fuwari-page-bg)"
+                  style={{ animationDelay: "-3s", animationDuration: "10s" }}
+                />
+                <use
+                  href="#fuwari-gentle-wave"
+                  x="48"
+                  y="5"
+                  className="opacity-75 fill-(--fuwari-page-bg)"
+                  style={{ animationDelay: "-4s", animationDuration: "13s" }}
+                />
+                <use
+                  href="#fuwari-gentle-wave"
+                  x="48"
+                  y="7"
+                  className="fill-(--fuwari-page-bg)"
+                  style={{ animationDelay: "-5s", animationDuration: "20s" }}
+                />
+              </g>
+            </svg>
+          </div>
         </div>
 
         {/* Main content - overlaps banner by MAIN_OVERLAP_REM */}

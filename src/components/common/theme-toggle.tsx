@@ -88,17 +88,17 @@ export function ThemeToggle({
     >
       <div className="relative flex items-center justify-center w-4 h-4">
         {/* Light Mode Icon */}
-        <span className="hidden [.light:not(.system)_&]:block">
+        <span className="absolute transition-all duration-300 ease-in-out opacity-0 rotate-180 [.light:not(.system)_&]:opacity-100 [.light:not(.system)_&]:rotate-0">
           <Sun size={14} strokeWidth={1.5} />
         </span>
 
         {/* Dark Mode Icon */}
-        <span className="hidden [.dark:not(.system)_&]:block">
+        <span className="absolute transition-all duration-300 ease-in-out opacity-0 rotate-180 [.dark:not(.system)_&]:opacity-100 [.dark:not(.system)_&]:rotate-0">
           <Moon size={14} strokeWidth={1.5} />
         </span>
 
         {/* System Mode Icon */}
-        <span className="hidden in-[.system]:block">
+        <span className="absolute transition-all duration-300 ease-in-out opacity-0 rotate-180 in-[.system]:opacity-100 in-[.system]:rotate-0">
           <Monitor size={14} strokeWidth={1.5} />
         </span>
       </div>

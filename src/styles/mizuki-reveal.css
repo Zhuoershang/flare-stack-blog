@@ -92,6 +92,27 @@
     transform 400ms var(--mizuki-reveal-ease);
 }
 
+/* --- Mizuki banner parallax waves (A7) --- */
+.fuwari-wave-parallax use {
+  animation: fuwari-wave 25s cubic-bezier(0.5, 0.5, 0.45, 0.5) infinite;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+@keyframes fuwari-wave {
+  0% {
+    transform: translate3d(-90px, 0, 0);
+  }
+  100% {
+    transform: translate3d(85px, 0, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fuwari-wave-parallax use {
+    animation: none;
+  }
+}
+
 /* Hover enhancements */
 .mizuki-button-enhance {
   transition:

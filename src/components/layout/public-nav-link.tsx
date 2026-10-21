@@ -22,6 +22,7 @@ export function PublicNavLink({
   onClick,
   openId,
   onOpenIdChange,
+  dataMenuitem,
 }: {
   option: NavOption;
   className?: string;
@@ -30,6 +31,8 @@ export function PublicNavLink({
   /** Shared id of the currently open dropdown; controlled by the navbar. */
   openId?: string | null;
   onOpenIdChange?: (openId: string | null) => void;
+  /** Marks rendered anchors as menu items (keyboard focus targets). */
+  dataMenuitem?: boolean;
 }) {
   if (option.children && option.children.length > 0) {
     if (!onOpenIdChange) {
@@ -47,6 +50,10 @@ export function PublicNavLink({
       />
     );
   }
+
+  const menuProps = dataMenuitem
+    ? ({ "data-menuitem": true, tabIndex: -1 } as const)
+    : {};
 
   const label = (
     <>
@@ -69,6 +76,7 @@ export function PublicNavLink({
         rel="noreferrer"
         className={className}
         onClick={onClick}
+        {...menuProps}
       >
         {label}
       </a>
@@ -86,6 +94,7 @@ export function PublicNavLink({
           activeClassName ? { className: activeClassName } : undefined
         }
         onClick={onClick}
+        {...menuProps}
       >
         {label}
       </Link>
@@ -102,6 +111,7 @@ export function PublicNavLink({
           activeClassName ? { className: activeClassName } : undefined
         }
         onClick={onClick}
+        {...menuProps}
       >
         {label}
       </Link>
@@ -109,7 +119,7 @@ export function PublicNavLink({
   }
 
   return (
-    <a href={option.href} className={className} onClick={onClick}>
+    <a href={option.href} className={className} onClick={onClick} {...menuProps}>
       {label}
     </a>
   );
@@ -130,6 +140,7 @@ function DropdownLeaf({
       option={{ ...option, children: undefined }}
       className={className}
       onClick={onClick}
+      dataMenuitem
     />
   );
 }
@@ -148,6 +159,7 @@ function NavDropdown({
   onOpenChange: (open: boolean) => void;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -158,6 +170,7 @@ function NavDropdown({
     const key = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       onOpenChange(false);
+      triggerRef.current?.focus({ preventScroll: true });
     };
     document.addEventListener("pointerdown", pointer);
     document.addEventListener("keydown", key);
@@ -167,6 +180,41 @@ function NavDropdown({
     };
   }, [open, onOpenChange]);
 
+  const handleTriggerKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      if (!open) onOpenChange(true);
+      requestAnimationFrame(() => {
+        rootRef.current
+          ?.querySelectorAll<HTMLElement>(".public-nav-dropdown-item")
+          .forEach((item, index, items) => {
+            if (index === 0) item.focus({ preventScroll: true });
+            void items;
+          });
+      });
+    }
+  };
+
+  const handlePanelKeyDown = (event: React.KeyboardEvent) => {
+    const items = Array.from(
+      rootRef.current?.querySelectorAll<HTMLElement>(
+        ".public-nav-dropdown-item",
+      ) ?? [],
+    );
+    const index = items.indexOf(document.activeElement as HTMLElement);
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      items[(index + 1 + items.length) % items.length]?.focus({
+        preventScroll: true,
+      });
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      items[(index - 1 + items.length) % items.length]?.focus({
+        preventScroll: true,
+      });
+    }
+  };
+
   return (
     <div
       ref={rootRef}
@@ -174,11 +222,13 @@ function NavDropdown({
       data-open={open}
     >
       <button
+        ref={triggerRef}
         type="button"
         className={`${className ?? ""} public-nav-dropdown-trigger`}
         aria-expanded={open}
         aria-haspopup="true"
         onClick={() => onOpenChange(!open)}
+        onKeyDown={handleTriggerKeyDown}
       >
         <span className="truncate">{option.label}</span>
         <ChevronDown
@@ -188,7 +238,11 @@ function NavDropdown({
         />
       </button>
       {open && (
-        <div className="public-nav-dropdown-panel" role="menu">
+        <div
+          className="public-nav-dropdown-panel"
+          role="menu"
+          onKeyDown={handlePanelKeyDown}
+        >
           {option.children?.map((child) => (
             <DropdownLeaf
               key={child.id}

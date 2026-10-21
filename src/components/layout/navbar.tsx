@@ -33,6 +33,7 @@ export function Navbar({
   const [open, setOpen] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const present = useMotionPresence(open, MOTION.popover);
   const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -46,10 +47,18 @@ export function Navbar({
   useEffect(() => {
     let previous = Math.max(0, window.scrollY);
     let travel = 0;
+    let scrolledTick = false;
     const handleScroll = () => {
       const y = Math.max(0, window.scrollY);
       const delta = y - previous;
       previous = y;
+      if (!scrolledTick) {
+        scrolledTick = true;
+        requestAnimationFrame(() => {
+          scrolledTick = false;
+          setIsScrolled(window.scrollY > 50);
+        });
+      }
       if (
         open ||
         (rootRef.current?.contains(document.activeElement) &&
@@ -123,6 +132,7 @@ export function Navbar({
       id="fuwari-navbar-wrapper"
       className="public-navbar-wrapper"
       data-hidden={isHidden && !open}
+      data-scrolled={isScrolled}
       onFocusCapture={() => setIsHidden(false)}
     >
       <div id="fuwari-navbar" className="public-navbar fuwari-card-base">
