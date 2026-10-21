@@ -125,6 +125,7 @@ bun dev
 ## 致谢
 
 - **[Fuwari](https://github.com/saicaca/fuwari)**：本项目优雅清新的界面与动效设计灵感源自 [@saicaca](https://github.com/saicaca) 优秀的开源博客主题。
+- **[Mizuki](https://github.com/LyraVoid/Mizuki)**（Apache-2.0）：部分界面元素（卡片毛玻璃变体、滚动入场动效、渐变按钮、阅读宽度 rail、导航栏毛玻璃、Banner 水波纹与轮播、相关文章推荐算法）移植自 [@LyraVoid](https://github.com/LyraVoid) 的 Mizuki 主题并适配 React 与 fuwari 变量体系。
 
 ## 开源协议
 
