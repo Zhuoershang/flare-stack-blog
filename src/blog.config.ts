@@ -24,6 +24,7 @@ export const blogConfig = {
       homeBg: "/images/home-bg.webp",
       avatar: "/images/avatar.png",
       primaryHue: 250,
+      wallpaper: "", // fullscreen background; empty = disabled
     },
   },
 } as const satisfies SiteConfig;

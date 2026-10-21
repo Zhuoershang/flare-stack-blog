@@ -505,12 +505,25 @@
 .fuwari-page-fade {
   overflow: hidden;
   transition:
-    opacity 200ms,
-    transform 200ms;
+    opacity 150ms cubic-bezier(0.55, 0.055, 0.675, 0.19),
+    transform 150ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
 .fuwari-page-fade.is-leaving {
   opacity: 0;
-  transform: translateY(1rem);
+  transform: translateY(-1.5rem);
+}
+.fuwari-page-fade > [key] {
+  animation: fuwari-page-enter 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+@keyframes fuwari-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

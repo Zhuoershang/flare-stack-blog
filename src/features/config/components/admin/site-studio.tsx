@@ -92,11 +92,13 @@ export function SiteStudio() {
   const author = useWatch({ control, name: "site.author" }) ?? "";
   const banner = useWatch({ control, name: "site.theme.fuwari.homeBg" });
   const avatar = useWatch({ control, name: "site.theme.fuwari.avatar" });
+  const wallpaper = useWatch({ control, name: "site.theme.fuwari.wallpaper" });
   const hueRaw = useWatch({ control, name: "site.theme.fuwari.primaryHue" });
   const hue =
     typeof hueRaw === "number" && !Number.isNaN(hueRaw) ? hueRaw : 250;
   const bannerSrc = previewSrc(banner);
   const avatarSrc = previewSrc(avatar);
+  const wallpaperSrc = previewSrc(wallpaper);
 
   return (
     <div className="site-studio">
@@ -199,6 +201,25 @@ export function SiteStudio() {
             }}
           />
           <output htmlFor="theme-hue-slider">{hue}°</output>
+        </div>
+      </section>
+      <section className="site-theme-row">
+        <div className="site-section-copy">
+          <label>{m.settings_site_wallpaper()}</label>
+          <p>{m.settings_site_wallpaper_hint()}</p>
+        </div>
+        <div className="site-hue-control">
+          <OverlayUpload
+            name="site.theme.fuwari.wallpaper"
+            assetPath="themes/fuwari/wallpaper.webp"
+            accept={IMAGE_ACCEPT}
+            className="site-banner-upload"
+            label={
+              wallpaperSrc
+                ? m.settings_site_wallpaper_replace()
+                : m.settings_site_wallpaper_upload()
+            }
+          />
         </div>
       </section>
       <NavLinksEditor />

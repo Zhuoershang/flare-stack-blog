@@ -72,6 +72,7 @@ export function resolveSiteConfig(
         primaryHue:
           config?.site?.theme?.fuwari?.primaryHue ??
           blogConfig.theme.fuwari.primaryHue,
+        wallpaper: config?.site?.theme?.fuwari?.wallpaper,
       },
     },
   });

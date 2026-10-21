@@ -3,6 +3,7 @@ import {
   useRouteContext,
   useRouterState,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 import type { PublicLayoutProps } from "@/components/layout/layout-props";
 import {
   getPublicImageSrc,
@@ -47,10 +48,32 @@ export function PublicLayout({
     location.pathname === "/submit-friend-link" ||
     location.pathname === "/profile";
   const bannerHeightVh = isHomePage ? BANNER_HEIGHT_HOME : BANNER_HEIGHT_PAGE;
+  const wallpaper = siteConfig.theme.fuwari.wallpaper;
+  const hasWallpaper = Boolean(wallpaper);
+
+  // Drive the Mizuki-style glass card variants from the wallpaper mode.
+  useEffect(() => {
+    document.body.classList.toggle("fuwari-wallpaper", hasWallpaper);
+    return () => document.body.classList.remove("fuwari-wallpaper");
+  }, [hasWallpaper]);
 
   return (
     <FloatingActionsProvider>
       <div className="relative min-h-screen bg-(--fuwari-page-bg) transition-colors">
+        {hasWallpaper && wallpaper ? (
+          <div
+            className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0"
+            style={{ opacity: 0.8, transform: "translateZ(0)" }}
+            aria-hidden="true"
+          >
+            <img
+              src={getPublicImageSrc(wallpaper, PUBLIC_IMAGE_WIDTH.banner)}
+              alt=""
+              className="w-full h-full object-cover object-center"
+              loading="lazy"
+            />
+          </div>
+        ) : null}
         {/* Top row: Navbar - sticky */}
         <div className="sticky top-0 z-50 pointer-events-none">
           <div className="pointer-events-auto max-w-(--fuwari-page-width) mx-auto px-0 md:px-4">

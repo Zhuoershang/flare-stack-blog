@@ -246,6 +246,7 @@ function createFuwariThemeSiteConfigSchema() {
     homeBg: createBackgroundImageRefSchema(),
     avatar: createAssetRefSchema(),
     primaryHue: createHueSchema(),
+    wallpaper: createBackgroundImageRefSchema().optional(),
   });
 }
 
@@ -254,6 +255,7 @@ function createFuwariThemeSiteConfigInputSchema() {
     homeBg: createBackgroundImageRefSchema().optional(),
     avatar: createAssetRefSchema().optional(),
     primaryHue: createHueSchema().optional(),
+    wallpaper: createBackgroundImageRefSchema().optional(),
   });
 }
 
@@ -262,6 +264,7 @@ function createFuwariThemeSiteConfigInputFormSchema(messages: Messages) {
     homeBg: createBackgroundImageRefFormSchema(messages).optional(),
     avatar: createAssetRefFormSchema(messages).optional(),
     primaryHue: createHueFormSchema(messages).optional(),
+    wallpaper: createBackgroundImageRefFormSchema(messages).optional(),
   });
 }
 
