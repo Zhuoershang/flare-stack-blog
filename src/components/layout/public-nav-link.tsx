@@ -32,9 +32,9 @@ export function PublicNavLink({
   onOpenIdChange?: (openId: string | null) => void;
 }) {
   if (option.children && option.children.length > 0) {
-    if (!openId || !onOpenIdChange) {
+    if (!onOpenIdChange) {
       throw new Error(
-        "PublicNavLink: dropdown items require openId and onOpenIdChange",
+        "PublicNavLink: dropdown items require onOpenIdChange",
       );
     }
     return (
