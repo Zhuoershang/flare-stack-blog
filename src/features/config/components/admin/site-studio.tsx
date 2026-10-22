@@ -307,8 +307,8 @@ function BannerImagesEditor() {
     if (fields.length >= 5) return;
     append(asset.url as never);
     setValue(
-      `site.theme.fuwari.bannerImageNames.${fields.length}` as never,
-      asset.fileName as never,
+      'site.theme.fuwari.bannerImageNames' as never,
+      [...(watch('site.theme.fuwari.bannerImageNames') ?? []), asset.fileName] as never,
       { shouldDirty: true },
     );
     setPickerOpen(false);
@@ -341,9 +341,13 @@ function BannerImagesEditor() {
                 label={m.settings_site_nav_remove()}
                 onClick={() => {
                   remove(index);
+                  const names = [
+                    ...(watch('site.theme.fuwari.bannerImageNames') ?? []),
+                  ];
+                  names.splice(index, 1);
                   setValue(
-                    `site.theme.fuwari.bannerImageNames.${index}` as never,
-                    undefined as never,
+                    'site.theme.fuwari.bannerImageNames' as never,
+                    names as never,
                     { shouldDirty: true },
                   );
                 }}
