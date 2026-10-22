@@ -72,6 +72,18 @@
         }
       }
     },
+    "related": {
+      "~orpc": {
+        "errorMap": {},
+        "meta": {},
+        "route": {
+          "method": "GET",
+          "path": "/posts/related/{slug}",
+          "summary": "List related published posts for a slug",
+          "tags": ["Posts"]
+        }
+      }
+    },
     "admin": {
       "list": {
         "~orpc": {
