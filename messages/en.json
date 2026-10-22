@@ -815,7 +815,7 @@
   "settings_site_nav_href_ph": "/about or https://...",
   "settings_site_nav_add": "Add Link",
   "settings_asset_clear": "Clear",
-  "settings_site_banner_images_hint": "Optional extra banner images. With more than one, the homepage banner cycles every 6 seconds with a crossfade; the first image above stays the primary one.",
+  "settings_site_banner_images_hint": "Optional extra banner images that join the homepage carousel after the cover image (cover always first, up to 5 in total).",
   "settings_site_banner_images_add": "Add Banner Image",
   "posts_related_reading": "Related Reading",
   "settings_features_title": "Feature Toggles",

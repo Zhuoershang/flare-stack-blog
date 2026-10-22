@@ -116,20 +116,6 @@ export function SiteStudio() {
     setWallpaperPickerOpen(false);
   };
 
-  const homeBgName = useWatch({ control, name: "site.theme.fuwari.homeBgName" });
-  const [bannerPickerOpen, setBannerPickerOpen] = useState(false);
-
-  const pickHomeBg = (asset: MediaAsset) => {
-    setValue("site.theme.fuwari.homeBg", asset.url, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    setValue("site.theme.fuwari.homeBgName", asset.fileName, {
-      shouldDirty: true,
-    });
-    setBannerPickerOpen(false);
-  };
-
   return (
     <div className="site-studio">
       <section className="site-identity">
@@ -147,24 +133,18 @@ export function SiteStudio() {
             />
             <Pencil size={17} aria-hidden="true" />
           </label>
-          <Button
-            variant="regular"
-            size="sm"
+          <OverlayUpload
+            name="site.theme.fuwari.homeBg"
+            assetPath="themes/fuwari/home-bg.webp"
+            accept={IMAGE_ACCEPT}
             className="site-banner-upload"
-            title={homeBgName || undefined}
-            onClick={() => setBannerPickerOpen(true)}
-          >
-            {bannerSrc
-              ? m.settings_site_banner_replace()
-              : m.settings_site_banner_upload()}
-          </Button>
+            label={
+              bannerSrc
+                ? m.settings_site_banner_replace()
+                : m.settings_site_banner_upload()
+            }
+          />
         </div>
-        <MediaPicker
-          open={bannerPickerOpen}
-          title={m.settings_site_banner_replace()}
-          onClose={() => setBannerPickerOpen(false)}
-          onSelect={pickHomeBg}
-        />
         <div className="site-banner-images-row">
           <BannerImagesEditor />
         </div>

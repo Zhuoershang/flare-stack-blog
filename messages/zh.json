@@ -808,7 +808,7 @@
   "settings_site_nav_href_ph": "/about 或 https://...",
   "settings_site_nav_add": "添加导航项",
   "settings_asset_clear": "清除",
-  "settings_site_banner_images_hint": "可选的额外横幅图片。配置多于一张时，首页横幅每 6 秒交叉淡入轮播；上方主图始终为第一张。",
+  "settings_site_banner_images_hint": "可选的追加横幅图片，将与上方封面图一起参与首页轮播（封面始终第一张，总共最多 5 张）。",
   "settings_site_banner_images_add": "添加横幅图片",
   "posts_related_reading": "相关阅读",
   "settings_features_title": "功能开关",

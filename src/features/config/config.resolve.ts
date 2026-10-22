@@ -67,7 +67,6 @@ export function resolveSiteConfig(
       fuwari: {
         homeBg:
           config?.site?.theme?.fuwari?.homeBg ?? blogConfig.theme.fuwari.homeBg,
-        homeBgName: config?.site?.theme?.fuwari?.homeBgName,
         avatar:
           config?.site?.theme?.fuwari?.avatar ?? blogConfig.theme.fuwari.avatar,
         primaryHue:

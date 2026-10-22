@@ -22,7 +22,6 @@ export const blogConfig = {
   theme: {
     fuwari: {
       homeBg: "/images/home-bg.webp",
-      homeBgName: "",
       avatar: "/images/avatar.png",
       primaryHue: 250,
       wallpaper: "", // fullscreen background; empty = disabled

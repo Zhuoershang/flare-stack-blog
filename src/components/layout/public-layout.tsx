@@ -94,11 +94,10 @@ export function PublicLayout({
           style={{ height: `${bannerHeightVh}vh` }}
         >
           <BannerCarousel
-            images={
-              siteConfig.theme.fuwari.bannerImages?.length
-                ? siteConfig.theme.fuwari.bannerImages
-                : [siteConfig.theme.fuwari.homeBg]
-            }
+            images={[
+              siteConfig.theme.fuwari.homeBg,
+              ...(siteConfig.theme.fuwari.bannerImages ?? []),
+            ].slice(0, 5)}
             highPriority={isHomePage}
           />
           {/* Mizuki parallax waves: fill follows the page background so the
