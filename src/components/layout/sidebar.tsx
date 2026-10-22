@@ -22,16 +22,6 @@ export function Sidebar({ className }: { className?: string }) {
       >
         <Profile />
       </div>
-      {slug ? (
-        <div
-          className="fuwari-onload-animation hidden lg:block"
-          style={{ animationDelay: "120ms" }}
-        >
-          <Suspense fallback={null}>
-            <RelatedPosts slug={slug} variant="sidebar" />
-          </Suspense>
-        </div>
-      ) : null}
       <div className="sticky top-4 flex flex-col gap-4">
         <div
           className="fuwari-onload-animation"
@@ -49,6 +39,16 @@ export function Sidebar({ className }: { className?: string }) {
             <Tags />
           </Suspense>
         </div>
+        {slug ? (
+          <div
+            className="fuwari-onload-animation hidden lg:block"
+            style={{ animationDelay: "250ms" }}
+          >
+            <Suspense fallback={null}>
+              <RelatedPosts slug={slug} variant="sidebar" />
+            </Suspense>
+          </div>
+        ) : null}
       </div>
     </aside>
   );

@@ -34,18 +34,21 @@ export function RelatedPosts({
 
   if (variant === "sidebar") {
     return (
-      <section className="fuwari-card-base p-4">
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-bold">
-          <ArrowRight size={15} className="text-(--fuwari-primary)" />
+      <div className="fuwari-card-base pb-4">
+        <div className="font-bold text-lg fuwari-text-90 relative ml-6 mt-4 mb-2">
+          <span
+            className="absolute -left-4 top-[5.5px] w-1 h-4 rounded-md"
+            style={{ backgroundColor: "var(--fuwari-primary)" }}
+          />
           {m.posts_related_reading()}
-        </h2>
-        <ul className="flex flex-col">
+        </div>
+        <ul className="px-4 flex flex-col">
           {related.map((post) => (
             <li key={post.slug}>
               <Link
                 to="/post/$slug"
                 params={{ slug: post.slug }}
-                className="group flex items-center gap-2.5 rounded-lg py-2 transition-colors hover:bg-(--fuwari-btn-regular-bg)"
+                className="group flex items-center w-full min-h-10 rounded-lg px-2 hover:px-3 hover:bg-(--fuwari-btn-plain-bg-hover) active:bg-(--fuwari-btn-plain-bg-active) transition-all"
               >
                 {post.cover ? (
                   <img
@@ -55,17 +58,17 @@ export function RelatedPosts({
                     )}
                     alt=""
                     loading="lazy"
-                    className="h-9 w-12 shrink-0 rounded-md object-cover"
+                    className="h-8 w-11 shrink-0 rounded-md object-cover"
                   />
                 ) : null}
-                <span className="line-clamp-2 text-[13px] leading-snug group-hover:text-(--fuwari-primary)">
+                <span className="ml-2 line-clamp-2 text-sm text-neutral-700 group-hover:text-(--fuwari-primary) dark:text-neutral-300 dark:group-hover:text-(--fuwari-primary) transition-colors min-w-0">
                   {post.title}
                 </span>
               </Link>
             </li>
           ))}
         </ul>
-      </section>
+      </div>
     );
   }
 
