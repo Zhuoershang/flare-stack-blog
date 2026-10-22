@@ -473,3 +473,7 @@
   gap: 12px;
   padding-left: 4px;
 }
+
+.site-wallpaper-upload {
+  position: static;
+}

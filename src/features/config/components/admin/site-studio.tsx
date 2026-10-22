@@ -222,7 +222,8 @@ export function SiteStudio() {
             name="site.theme.fuwari.wallpaper"
             assetPath="themes/fuwari/wallpaper.webp"
             accept={IMAGE_ACCEPT}
-            className="site-banner-upload"
+            className="site-wallpaper-upload"
+            variant="regular"
             clearable
             label={
               wallpaperSrc
