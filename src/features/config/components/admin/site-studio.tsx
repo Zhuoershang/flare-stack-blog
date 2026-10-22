@@ -11,7 +11,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -256,6 +256,7 @@ export function SiteStudio() {
   );
 }
 function BannerImagesEditor() {
+  const inputRef = useRef<HTMLInputElement>(null);
   const { control } = useFormContext<SystemConfig>();
   const { fields, append, remove, move } = useFieldArray({
     control,
@@ -305,8 +306,9 @@ function BannerImagesEditor() {
         ))}
       </div>
       {fields.length < 5 ? (
-        <label className="site-add-link">
+        <div className="site-add-link">
           <input
+            ref={inputRef}
             type="file"
             accept={IMAGE_ACCEPT}
             className="hidden"
@@ -331,10 +333,16 @@ function BannerImagesEditor() {
               });
             }}
           />
-          <Button variant="text" size="sm" icon={<Plus size={14} />} loading={upload.isPending}>
+          <Button
+            variant="text"
+            size="sm"
+            icon={<Plus size={14} />}
+            loading={upload.isPending}
+            onClick={() => inputRef.current?.click()}
+          >
             {m.settings_site_banner_images_add()}
           </Button>
-        </label>
+        </div>
       ) : null}
     </div>
   );
