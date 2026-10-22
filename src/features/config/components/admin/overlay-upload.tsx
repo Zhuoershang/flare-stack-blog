@@ -18,6 +18,7 @@ export function OverlayUpload({
   className,
   label,
   variant = "overlay",
+  clearable = false,
 }: {
   name: FieldPath<SystemConfig>;
   assetPath: string;
@@ -26,6 +27,8 @@ export function OverlayUpload({
   label?: string;
   /** `regular` where the button does not sit on an image. */
   variant?: "overlay" | "regular";
+  /** Shows a clear button when a value is set (empty string disables). */
+  clearable?: boolean;
 }) {
   const { setValue, watch } = useFormContext<SystemConfig>();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -83,6 +86,20 @@ export function OverlayUpload({
       >
         {buttonText}
       </Button>
+      {clearable && currentValue ? (
+        <Button
+          variant="regular"
+          size="sm"
+          onClick={() =>
+            setValue(name, "" as never, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
+        >
+          {m.settings_asset_clear()}
+        </Button>
+      ) : null}
     </>
   );
 }

@@ -1,4 +1,5 @@
 import type { PostItem } from "@/features/posts/schema/posts.schema";
+import { useRouteContext } from "@tanstack/react-router";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { HomePagination } from "./home-pagination";
 import { PostCard } from "./post-card";
@@ -18,7 +19,9 @@ export function HomePage({
   page,
   totalPages,
 }: HomePageProps) {
-  useScrollReveal([page]);
+  const { siteConfig } = useRouteContext({ from: "__root__" });
+  const scrollReveal = siteConfig.features?.scrollReveal ?? true;
+  useScrollReveal([page, scrollReveal]);
   const popularSlugs = new Set((popularPosts ?? []).map((post) => post.slug));
   return (
     <div className="flex flex-col gap-4">
@@ -26,8 +29,8 @@ export function HomePage({
         {posts.map((post, i) => (
           <div
             key={post.slug}
-            className="mizuki-on-scroll"
-            data-mizuki-reveal
+            className={scrollReveal ? "mizuki-on-scroll" : undefined}
+            data-mizuki-reveal={scrollReveal ? true : undefined}
           >
             <PostCard
               post={post}

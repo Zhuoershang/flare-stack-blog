@@ -25,6 +25,12 @@ export const blogConfig = {
       avatar: "/images/avatar.png",
       primaryHue: 250,
       wallpaper: "", // fullscreen background; empty = disabled
+      bannerImages: [],
     },
+  },
+  features: {
+    relatedPosts: true,
+    relatedPostsLimit: 5,
+    scrollReveal: true,
   },
 } as const satisfies SiteConfig;

@@ -284,6 +284,15 @@ const fuwariThemeSiteConfigSchema = createFuwariThemeSiteConfigSchema();
 const fuwariThemeSiteConfigInputSchema =
   createFuwariThemeSiteConfigInputSchema();
 
+
+const SiteFeaturesSchema = z.object({
+  relatedPosts: z.boolean().optional(),
+  relatedPostsLimit: z.number().int().min(1).max(5).optional(),
+  scrollReveal: z.boolean().optional(),
+});
+
+export type SiteFeatures = z.infer<typeof SiteFeaturesSchema>;
+
 export const FullSiteConfigSchema = z.object({
   title: createSiteTextSchema(120),
   author: createSiteTextSchema(80),
@@ -301,6 +310,7 @@ export const FullSiteConfigSchema = z.object({
   theme: z.object({
     fuwari: fuwariThemeSiteConfigSchema,
   }),
+  features: SiteFeaturesSchema,
 });
 
 export function createSiteConfigInputFormSchema(messages: Messages) {
@@ -323,6 +333,13 @@ export function createSiteConfigInputFormSchema(messages: Messages) {
     theme: z
       .object({
         fuwari: createFuwariThemeSiteConfigInputFormSchema(messages).optional(),
+      })
+      .optional(),
+    features: z
+      .object({
+        relatedPosts: z.boolean().optional(),
+        relatedPostsLimit: z.number().int().min(1).max(5).optional(),
+        scrollReveal: z.boolean().optional(),
       })
       .optional(),
   });
@@ -349,7 +366,10 @@ export const SiteConfigInputSchema = z.object({
       fuwari: fuwariThemeSiteConfigInputSchema.optional(),
     })
     .optional(),
+  features: SiteFeaturesSchema.optional(),
 });
+
+
 
 export type SiteConfig = z.infer<typeof FullSiteConfigSchema>;
 export type SiteConfigInput = z.infer<typeof SiteConfigInputSchema>;

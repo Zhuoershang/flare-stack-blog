@@ -76,6 +76,11 @@ export function resolveSiteConfig(
         bannerImages: config?.site?.theme?.fuwari?.bannerImages,
       },
     },
+    features: {
+      relatedPosts: config?.site?.features?.relatedPosts ?? true,
+      relatedPostsLimit: config?.site?.features?.relatedPostsLimit ?? 5,
+      scrollReveal: config?.site?.features?.scrollReveal ?? true,
+    },
   });
 }
 

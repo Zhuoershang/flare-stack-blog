@@ -430,3 +430,46 @@
     transition: none;
   }
 }
+
+.site-banner-images {
+  margin-top: 10px;
+}
+.site-banner-images-hint {
+  font-size: 12px;
+  color: var(--fuwari-fg-50);
+  margin-bottom: 8px;
+}
+.site-banner-images-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.site-banner-image-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.site-banner-image-thumb {
+  width: 120px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--fuwari-input-border);
+}
+.site-banner-image-actions {
+  display: flex;
+  gap: 4px;
+}
+.site-features {
+  display: grid;
+  gap: 14px;
+  max-width: calc(760 * var(--admin-unit));
+  margin-top: 14px;
+}
+.site-feature-limit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 4px;
+}

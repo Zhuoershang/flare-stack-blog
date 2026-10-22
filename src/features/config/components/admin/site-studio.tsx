@@ -13,10 +13,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { OverlayUpload } from "@/features/config/components/admin/overlay-upload";
 import type { SystemConfig } from "@/features/config/config.schema";
 import {
@@ -33,6 +36,11 @@ import {
   SOCIAL_PLATFORM_KEYS,
   SOCIAL_PLATFORMS,
 } from "@/features/config/utils/social-platforms";
+import {
+  SITE_ASSET_MAX_FILE_SIZE,
+  SITE_ASSET_MAX_FILE_SIZE_MB,
+} from "@/features/config/config.asset.schema";
+import { orpcClient } from "@/lib/orpc";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 
@@ -128,6 +136,7 @@ export function SiteStudio() {
                 : m.settings_site_banner_upload()
             }
           />
+          <BannerImagesEditor />
         </div>
         <div className="site-profile">
           <div className="site-avatar-edit">
@@ -214,6 +223,7 @@ export function SiteStudio() {
             assetPath="themes/fuwari/wallpaper.webp"
             accept={IMAGE_ACCEPT}
             className="site-banner-upload"
+            clearable
             label={
               wallpaperSrc
                 ? m.settings_site_wallpaper_replace()
@@ -222,6 +232,7 @@ export function SiteStudio() {
           />
         </div>
       </section>
+      <FeaturesEditor />
       <NavLinksEditor />
       <SettingsDisclosure
         className="site-icons"
@@ -241,6 +252,153 @@ export function SiteStudio() {
     </div>
   );
 }
+function BannerImagesEditor() {
+  const { control } = useFormContext<SystemConfig>();
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: 'site.theme.fuwari.bannerImages' as never,
+  });
+  const upload = useMutation({
+    mutationFn: (file: File) =>
+      orpcClient.config.admin.uploadAsset({
+        file,
+        assetPath: `themes/fuwari/banner-1792634925414.webp`,
+      }),
+    onError: (error) => {
+      toast.error(m.settings_asset_upload_fail(), {
+        description: error instanceof Error ? error.message : undefined,
+      });
+    },
+  });
+
+  return (
+    <div className="site-banner-images">
+      <p className="site-banner-images-hint">{m.settings_site_banner_images_hint()}</p>
+      <div className="site-banner-images-list">
+        {fields.map((field, index) => (
+          <div key={field.id} className="site-banner-image-item">
+            <BannerImageThumb name={`site.theme.fuwari.bannerImages.${index}.` as never} index={index} />
+            <div className="site-banner-image-actions">
+              <IconButton
+                size="md"
+                label={m.settings_nav_drag_label({ name: String(index + 1) })}
+                disabled={fields.length < 2}
+                onClick={() => {
+                  if (index > 0) move(index, index - 1);
+                }}
+              >
+                <GripVertical size={16} />
+              </IconButton>
+              <IconButton
+                size="md"
+                tone="danger"
+                label={m.settings_site_nav_remove()}
+                onClick={() => remove(index)}
+              >
+                <Trash2 size={16} />
+              </IconButton>
+            </div>
+          </div>
+        ))}
+      </div>
+      {fields.length < 5 ? (
+        <label className="site-add-link">
+          <input
+            type="file"
+            accept={IMAGE_ACCEPT}
+            className="hidden"
+            disabled={upload.isPending}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              if (!file) return;
+              if (file.size > SITE_ASSET_MAX_FILE_SIZE) {
+                toast.error(m.settings_asset_upload_fail(), {
+                  description: m.settings_asset_validation_file_too_large({
+                    maxSizeMb: SITE_ASSET_MAX_FILE_SIZE_MB,
+                  }),
+                });
+                return;
+              }
+              upload.mutate(file, {
+                onSuccess: (result) => {
+                  append(result.url as never);
+                  toast.success(m.settings_asset_upload_success());
+                },
+              });
+            }}
+          />
+          <Button variant="text" size="sm" icon={<Plus size={14} />} loading={upload.isPending}>
+            {m.settings_site_banner_images_add()}
+          </Button>
+        </label>
+      ) : null}
+    </div>
+  );
+}
+
+function BannerImageThumb({ name }: { name: string; index: number }) {
+  const { watch } = useFormContext<SystemConfig>();
+  const src = previewSrc(watch(name as never));
+  if (!src) return null;
+  return <img src={src} alt="" className="site-banner-image-thumb" />;
+}
+
+function FeaturesEditor() {
+  const { watch, setValue } = useFormContext<SystemConfig>();
+  const relatedOn = watch('site.features.relatedPosts') ?? true;
+  const revealOn = watch('site.features.scrollReveal') ?? true;
+  const limit = watch('site.features.relatedPostsLimit') ?? 5;
+
+  return (
+    <section className="site-nav-section">
+      <div className="site-section-copy">
+        <h2>{m.settings_features_title()}</h2>
+      </div>
+      <div className="site-features">
+        <Switch
+          label={m.settings_features_related_enabled()}
+          checked={relatedOn}
+          onCheckedChange={(checked) =>
+            setValue('site.features.relatedPosts', checked, {
+              shouldDirty: true,
+            })
+          }
+        />
+        {relatedOn ? (
+          <div className="site-feature-limit">
+            <span className="text-sm fuwari-text-50">
+              {m.settings_features_related_limit()}
+            </span>
+            <Select
+              className="w-24"
+              value={String(limit)}
+              onChange={(next) =>
+                setValue('site.features.relatedPostsLimit', Number(next), {
+                  shouldDirty: true,
+                })
+              }
+              options={[1, 2, 3, 4, 5].map((n) => ({
+                value: String(n),
+                label: String(n),
+              }))}
+            />
+          </div>
+        ) : null}
+        <Switch
+          label={m.settings_features_scroll_reveal()}
+          checked={revealOn}
+          onCheckedChange={(checked) =>
+            setValue('site.features.scrollReveal', checked, {
+              shouldDirty: true,
+            })
+          }
+        />
+      </div>
+    </section>
+  );
+}
+
 function NavLinksEditor() {
   const { control } = useFormContext<SystemConfig>();
   const { fields, append, remove, move } = useFieldArray({
