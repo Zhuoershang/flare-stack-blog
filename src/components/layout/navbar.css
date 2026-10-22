@@ -53,10 +53,19 @@
   --nav-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
 }
 /* At rest the navbar is transparent over the banner; keep its text
-   legible on busy images with a soft dark drop-shadow (removed once
-   the frosted background appears). */
+   legible on busy images: force white text with a soft dark
+   drop-shadow (both removed together with the transparent state). */
 .public-navbar-wrapper[data-scrolled="false"] .public-navbar :is(.public-brand, .public-nav-link, .public-nav-dropdown-trigger, .public-nav-search) {
+  color: white;
   filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.55));
+}
+/* No solid hover/active backgrounds over the banner — hover only
+   brightens the text; the frosted state restores normal backgrounds. */
+.public-navbar-wrapper[data-scrolled="false"] .public-navbar :is(.public-nav-active, .public-nav-link:hover, .public-nav-dropdown[data-open="true"] > .public-nav-dropdown-trigger) {
+  background: transparent;
+}
+.public-navbar-wrapper[data-scrolled="false"] .public-navbar .public-nav-search {
+  background: rgb(0 0 0 / 0.18);
 }
 .public-brand {
   display: flex;
