@@ -46,6 +46,10 @@ export default defineConfig(async () => {
       env: loadEnv("test", process.cwd(), "VITE_"),
       setupFiles: ["./tests/apply-migrations.ts"],
       include: ["src/**/*.integration.test.ts"],
+      // Each integration file boots its own miniflare/workerd; on an 8GB
+      // host parallel instances exhaust memory, so run them one at a time.
+      maxWorkers: 1,
+      fileParallelism: false,
       testTimeout: 50_000,
       hookTimeout: 50_000,
       teardownTimeout: 50_000,

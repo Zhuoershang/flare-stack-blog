@@ -13,5 +13,8 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
     exclude: ["**/*.integration.test.ts"],
+    // 8GB host: cap concurrency to avoid memory-driven timeouts.
+    maxWorkers: 2,
+    fileParallelism: false,
   },
 });
