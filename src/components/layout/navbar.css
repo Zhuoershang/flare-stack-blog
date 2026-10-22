@@ -18,7 +18,9 @@
  * All chrome appearance flows from four tokens; the semi (frosted glass)
  * default activates a translucent card color + backdrop blur. */
 .public-navbar {
-  --nav-bg: var(--fuwari-card-bg);
+  /* Transparent over the banner at rest; frosted glass after scrolling
+     50px (semifull mode, per Mizuki). */
+  --nav-bg: transparent;
   --nav-blur: none;
   --nav-shadow: none;
 
@@ -49,6 +51,12 @@
 .dark .public-navbar-wrapper[data-scrolled="true"] .public-navbar {
   --nav-bg: rgb(23 23 23 / 0.45);
   --nav-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+}
+/* At rest the navbar is transparent over the banner; keep its text
+   legible on busy images with a soft dark drop-shadow (removed once
+   the frosted background appears). */
+.public-navbar-wrapper[data-scrolled="false"] .public-navbar :is(.public-brand, .public-nav-link, .public-nav-dropdown-trigger, .public-nav-search) {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.55));
 }
 .public-brand {
   display: flex;
