@@ -137,7 +137,9 @@ export function SiteStudio() {
             }
           />
         </div>
-        <BannerImagesEditor />
+        <div className="site-banner-images-row">
+          <BannerImagesEditor />
+        </div>
         <div className="site-profile">
           <div className="site-avatar-edit">
             <div className="site-avatar">
