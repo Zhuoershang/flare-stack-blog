@@ -102,6 +102,19 @@ export function SiteStudio() {
   const bannerSrc = previewSrc(banner);
   const avatarSrc = previewSrc(avatar);
   const wallpaperSrc = previewSrc(wallpaper);
+  const wallpaperName = useWatch({ control, name: "site.theme.fuwari.wallpaperName" });
+  const [wallpaperPickerOpen, setWallpaperPickerOpen] = useState(false);
+
+  const pickWallpaper = (asset: MediaAsset) => {
+    setValue("site.theme.fuwari.wallpaper", asset.url, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setValue("site.theme.fuwari.wallpaperName", asset.fileName, {
+      shouldDirty: true,
+    });
+    setWallpaperPickerOpen(false);
+  };
 
   return (
     <div className="site-studio">
@@ -215,18 +228,47 @@ export function SiteStudio() {
           <p>{m.settings_site_wallpaper_hint()}</p>
         </div>
         <div className="site-hue-control">
-          <OverlayUpload
-            name="site.theme.fuwari.wallpaper"
-            assetPath="themes/fuwari/wallpaper.webp"
-            accept={IMAGE_ACCEPT}
-            className="site-wallpaper-upload"
+          <Button
             variant="regular"
-            clearable
-            label={
-              wallpaperSrc
-                ? m.settings_site_wallpaper_replace()
-                : m.settings_site_wallpaper_upload()
-            }
+            size="sm"
+            onClick={() => setWallpaperPickerOpen(true)}
+          >
+            {wallpaperSrc
+              ? m.settings_site_wallpaper_replace()
+              : m.settings_site_wallpaper_upload()}
+          </Button>
+          {wallpaperSrc ? (
+            <>
+              <Button
+                variant="regular"
+                size="sm"
+                onClick={() => {
+                  setValue("site.theme.fuwari.wallpaper", "", {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                  setValue("site.theme.fuwari.wallpaperName", "", {
+                    shouldDirty: true,
+                  });
+                }}
+              >
+                {m.settings_asset_clear()}
+              </Button>
+              {wallpaperName ? (
+                <span
+                  className="site-wallpaper-name"
+                  title={wallpaperName}
+                >
+                  {wallpaperName}
+                </span>
+              ) : null}
+            </>
+          ) : null}
+          <MediaPicker
+            open={wallpaperPickerOpen}
+            title={m.settings_site_wallpaper_upload()}
+            onClose={() => setWallpaperPickerOpen(false)}
+            onSelect={pickWallpaper}
           />
         </div>
       </section>

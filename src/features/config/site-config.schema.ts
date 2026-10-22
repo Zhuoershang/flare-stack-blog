@@ -247,6 +247,7 @@ function createFuwariThemeSiteConfigSchema() {
     avatar: createAssetRefSchema(),
     primaryHue: createHueSchema(),
     wallpaper: createBackgroundImageRefSchema().optional(),
+    wallpaperName: z.string().max(255).optional(),
     bannerImages: z
       .array(createBackgroundImageRefSchema())
       .max(5)
@@ -261,6 +262,7 @@ function createFuwariThemeSiteConfigInputSchema() {
     avatar: createAssetRefSchema().optional(),
     primaryHue: createHueSchema().optional(),
     wallpaper: createBackgroundImageRefSchema().optional(),
+    wallpaperName: z.string().max(255).optional(),
     bannerImages: z
       .array(createBackgroundImageRefSchema())
       .max(5)
@@ -275,6 +277,7 @@ function createFuwariThemeSiteConfigInputFormSchema(messages: Messages) {
     avatar: createAssetRefFormSchema(messages).optional(),
     primaryHue: createHueFormSchema(messages).optional(),
     wallpaper: createBackgroundImageRefFormSchema(messages).optional(),
+    wallpaperName: z.string().max(255).optional(),
     bannerImages: z
       .array(createBackgroundImageRefFormSchema(messages))
       .max(5)

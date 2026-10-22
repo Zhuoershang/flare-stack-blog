@@ -25,6 +25,7 @@ export const blogConfig = {
       avatar: "/images/avatar.png",
       primaryHue: 250,
       wallpaper: "", // fullscreen background; empty = disabled
+      wallpaperName: "",
       bannerImages: [],
       bannerImageNames: [],
     },

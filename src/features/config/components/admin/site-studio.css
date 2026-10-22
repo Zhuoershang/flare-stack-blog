@@ -495,6 +495,12 @@
   padding-left: 4px;
 }
 
-.site-wallpaper-upload {
-  position: static;
+
+.site-wallpaper-name {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--fuwari-fg-50);
 }

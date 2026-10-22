@@ -73,6 +73,7 @@ export function resolveSiteConfig(
           config?.site?.theme?.fuwari?.primaryHue ??
           blogConfig.theme.fuwari.primaryHue,
         wallpaper: config?.site?.theme?.fuwari?.wallpaper,
+        wallpaperName: config?.site?.theme?.fuwari?.wallpaperName,
         bannerImages: config?.site?.theme?.fuwari?.bannerImages,
         bannerImageNames: config?.site?.theme?.fuwari?.bannerImageNames,
       },
