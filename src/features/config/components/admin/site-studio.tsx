@@ -136,8 +136,8 @@ export function SiteStudio() {
                 : m.settings_site_banner_upload()
             }
           />
-          <BannerImagesEditor />
         </div>
+        <BannerImagesEditor />
         <div className="site-profile">
           <div className="site-avatar-edit">
             <div className="site-avatar">
