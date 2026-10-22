@@ -266,7 +266,7 @@ function BannerImagesEditor() {
     mutationFn: (file: File) =>
       orpcClient.config.admin.uploadAsset({
         file,
-        assetPath: `themes/fuwari/banner-${crypto.randomUUID()}.webp`,
+        assetPath: `themes/fuwari/banner-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`,
       }),
     onError: (error) => {
       toast.error(m.settings_asset_upload_fail(), {
