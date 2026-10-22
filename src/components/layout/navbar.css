@@ -39,11 +39,15 @@
     box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .public-navbar-wrapper[data-scrolled="true"] .public-navbar {
-  --nav-bg: var(--fuwari-card-bg-transparent);
+  /* Semi-translucent regardless of wallpaper mode: the wallpaper-linked
+     --fuwari-card-bg-transparent resolves to the opaque card color when
+     no wallpaper is set, which would make the glass effect invisible. */
+  --nav-bg: rgb(255 255 255 / 0.72);
   --nav-blur: blur(8px);
   --nav-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
 }
 .dark .public-navbar-wrapper[data-scrolled="true"] .public-navbar {
+  --nav-bg: rgb(23 23 23 / 0.72);
   --nav-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
 }
 .public-brand {
