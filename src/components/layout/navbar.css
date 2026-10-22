@@ -67,6 +67,15 @@
 .public-navbar-wrapper[data-scrolled="false"] .public-navbar .public-nav-search {
   background: rgb(0 0 0 / 0.18);
 }
+/* Tool buttons (theme, language, account, mobile trigger) also go
+   white with the same hover treatment in the transparent state. */
+.public-navbar-wrapper[data-scrolled="false"] .public-navbar .public-tool-button {
+  color: white;
+}
+.public-navbar-wrapper[data-scrolled="false"] .public-navbar :is(.public-tool-button:hover, .public-tool-button[aria-expanded="true"], .public-nav-search:hover) {
+  background: rgb(0 0 0 / 0.18);
+  color: white;
+}
 .public-brand {
   display: flex;
   align-items: center;
