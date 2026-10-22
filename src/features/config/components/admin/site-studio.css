@@ -470,6 +470,14 @@
   border-radius: 10px;
   border: 1px solid var(--fuwari-input-border);
 }
+.site-banner-image-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--fuwari-fg-50);
+}
 .site-banner-image-actions {
   display: flex;
   gap: 4px;

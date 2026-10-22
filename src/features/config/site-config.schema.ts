@@ -251,6 +251,7 @@ function createFuwariThemeSiteConfigSchema() {
       .array(createBackgroundImageRefSchema())
       .max(5)
       .optional(),
+    bannerImageNames: z.array(z.string().max(255)).optional(),
   });
 }
 
@@ -264,6 +265,7 @@ function createFuwariThemeSiteConfigInputSchema() {
       .array(createBackgroundImageRefSchema())
       .max(5)
       .optional(),
+    bannerImageNames: z.array(z.string().max(255)).optional(),
   });
 }
 
@@ -277,6 +279,7 @@ function createFuwariThemeSiteConfigInputFormSchema(messages: Messages) {
       .array(createBackgroundImageRefFormSchema(messages))
       .max(5)
       .optional(),
+    bannerImageNames: z.array(z.string().max(255)).optional(),
   });
 }
 

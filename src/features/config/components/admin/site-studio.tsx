@@ -11,16 +11,16 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { OverlayUpload } from "@/features/config/components/admin/overlay-upload";
+import { MediaPicker } from "@/features/media/components/media-library/components/media-picker";
+import type { MediaAsset } from "@/features/media/components/media-library/types";
 import type { SystemConfig } from "@/features/config/config.schema";
 import {
   FUWARI_THEME_HUE_MAX,
@@ -36,11 +36,6 @@ import {
   SOCIAL_PLATFORM_KEYS,
   SOCIAL_PLATFORMS,
 } from "@/features/config/utils/social-platforms";
-import {
-  SITE_ASSET_MAX_FILE_SIZE,
-  SITE_ASSET_MAX_FILE_SIZE_MB,
-} from "@/features/config/config.asset.schema";
-import { orpcClient } from "@/lib/orpc";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 
@@ -256,24 +251,26 @@ export function SiteStudio() {
   );
 }
 function BannerImagesEditor() {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { control } = useFormContext<SystemConfig>();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const { control, setValue, watch } = useFormContext<SystemConfig>();
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: 'site.theme.fuwari.bannerImages' as never,
   });
-  const upload = useMutation({
-    mutationFn: (file: File) =>
-      orpcClient.config.admin.uploadAsset({
-        file,
-        assetPath: `themes/fuwari/banner-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`,
-      }),
-    onError: (error) => {
-      toast.error(m.settings_asset_upload_fail(), {
-        description: error instanceof Error ? error.message : undefined,
-      });
-    },
-  });
+  const names = watch('site.theme.fuwari.bannerImageNames') as
+    | Array<string | undefined>
+    | undefined;
+
+  const addMedia = (asset: MediaAsset) => {
+    if (fields.length >= 5) return;
+    append(asset.url as never);
+    setValue(
+      `site.theme.fuwari.bannerImageNames.${fields.length}` as never,
+      asset.fileName as never,
+      { shouldDirty: true },
+    );
+    setPickerOpen(false);
+  };
 
   return (
     <div className="site-banner-images">
@@ -282,6 +279,9 @@ function BannerImagesEditor() {
         {fields.map((field, index) => (
           <div key={field.id} className="site-banner-image-item">
             <BannerImageThumb name={`site.theme.fuwari.bannerImages.${index}.` as never} index={index} />
+            <p className="site-banner-image-name" title={names?.[index]}>
+              {names?.[index]}
+            </p>
             <div className="site-banner-image-actions">
               <IconButton
                 size="md"
@@ -297,7 +297,14 @@ function BannerImagesEditor() {
                 size="md"
                 tone="danger"
                 label={m.settings_site_nav_remove()}
-                onClick={() => remove(index)}
+                onClick={() => {
+                  remove(index);
+                  setValue(
+                    `site.theme.fuwari.bannerImageNames.${index}` as never,
+                    undefined as never,
+                    { shouldDirty: true },
+                  );
+                }}
               >
                 <Trash2 size={16} />
               </IconButton>
@@ -306,44 +313,21 @@ function BannerImagesEditor() {
         ))}
       </div>
       {fields.length < 5 ? (
-        <div className="site-add-link">
-          <input
-            ref={inputRef}
-            type="file"
-            accept={IMAGE_ACCEPT}
-            className="hidden"
-            disabled={upload.isPending}
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              event.target.value = '';
-              if (!file) return;
-              if (file.size > SITE_ASSET_MAX_FILE_SIZE) {
-                toast.error(m.settings_asset_upload_fail(), {
-                  description: m.settings_asset_validation_file_too_large({
-                    maxSizeMb: SITE_ASSET_MAX_FILE_SIZE_MB,
-                  }),
-                });
-                return;
-              }
-              upload.mutate(file, {
-                onSuccess: (result) => {
-                  append(result.url as never);
-                  toast.success(m.settings_asset_upload_success());
-                },
-              });
-            }}
-          />
-          <Button
-            variant="text"
-            size="sm"
-            icon={<Plus size={14} />}
-            loading={upload.isPending}
-            onClick={() => inputRef.current?.click()}
-          >
-            {m.settings_site_banner_images_add()}
-          </Button>
-        </div>
+        <Button
+          variant="text"
+          size="sm"
+          icon={<Plus size={14} />}
+          onClick={() => setPickerOpen(true)}
+        >
+          {m.settings_site_banner_images_add()}
+        </Button>
       ) : null}
+      <MediaPicker
+        open={pickerOpen}
+        title={m.settings_site_banner_images_add()}
+        onClose={() => setPickerOpen(false)}
+        onSelect={addMedia}
+      />
     </div>
   );
 }

@@ -26,6 +26,7 @@ export const blogConfig = {
       primaryHue: 250,
       wallpaper: "", // fullscreen background; empty = disabled
       bannerImages: [],
+      bannerImageNames: [],
     },
   },
   features: {

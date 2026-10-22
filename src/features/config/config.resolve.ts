@@ -74,6 +74,7 @@ export function resolveSiteConfig(
           blogConfig.theme.fuwari.primaryHue,
         wallpaper: config?.site?.theme?.fuwari?.wallpaper,
         bannerImages: config?.site?.theme?.fuwari?.bannerImages,
+        bannerImageNames: config?.site?.theme?.fuwari?.bannerImageNames,
       },
     },
     features: {
